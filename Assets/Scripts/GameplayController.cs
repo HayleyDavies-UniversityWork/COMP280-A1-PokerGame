@@ -6,6 +6,7 @@ using UnityEngine.UI;
 namespace Poker.Game
 {
     using Utils;
+    using Display;
     public class GameplayController : MonoBehaviour
     {
         Table pokerTable;
@@ -14,8 +15,13 @@ namespace Poker.Game
         public int dealer;
         public int currentPlayerIndex;
         public DebugMode debugMode;
+        public Queue<Player> playerQueue;
+
+        public DisplayCard testCard;
 
         int currentBet;
+
+        public List<DisplayCard> tableCards;
 
         [SerializeField] Button startGameButton;
 
@@ -51,6 +57,9 @@ namespace Poker.Game
             dealerID++;
 
             currentBet = gameSettings.bigBlind;
+            PlayFlop();
+            PlayTurn();
+            PlayRiver();
         }
 
         void PlayBlinds()
@@ -76,9 +85,32 @@ namespace Poker.Game
             {
                 foreach (Player p in pokerTable.playerList)
                 {
-                    p.GiveCard(pokerTable.deck.DealCard());
+                    Card card = pokerTable.deck.DealCard();
+                    p.GiveCard(card);
+                    testCard.SetCard(card);
                 }
             }
+        }
+
+        void PlayFlop()
+        {
+            for (int i = 0; i < 3; i++)
+            {
+                Card card = pokerTable.deck.DealCard();
+                tableCards[i].SetCard(card);
+            }
+        }
+
+        void PlayTurn()
+        {
+            Card card = pokerTable.deck.DealCard();
+            tableCards[3].SetCard(card);
+        }
+
+        void PlayRiver()
+        {
+            Card card = pokerTable.deck.DealCard();
+            tableCards[4].SetCard(card);
         }
 
         void PlayerTurn(int playerID)

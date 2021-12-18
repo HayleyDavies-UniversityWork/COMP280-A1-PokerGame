@@ -8,33 +8,44 @@ namespace Poker.Game
     {
         // an array to store the card numbers
         public static string[] numbers = {
-        "A",
-        "2",
-        "3",
-        "4",
-        "5",
-        "6",
-        "7",
-        "8",
-        "9",
-        "10",
-        "J",
-        "Q",
-        "K"
-    };
+            "A",
+            "2",
+            "3",
+            "4",
+            "5",
+            "6",
+            "7",
+            "8",
+            "9",
+            "10",
+            "J",
+            "Q",
+            "K"
+        };
 
         // an array to store the card suits
         public static string[] suits = {
-        "♠",
-        "♣",
-        "♥",
-        "♦"
-    };
+            "♠",
+            "♣",
+            "♥",
+            "♦"
+        };
+
+        public static Dictionary<string, Color> suitColor = new Dictionary<string, Color> {
+            {"♠", Color.black},
+            {"♣", Color.black},
+            {"♥", Color.red},
+            {"♦", Color.red}
+        };
 
         public string cardValue;
-        public Card(string _cardValue)
+        public string cardNumber;
+        public string cardSuit;
+        public Card(string _cardNumber, string _cardSuit)
         {
-            cardValue = _cardValue;
+            cardNumber = _cardNumber;
+            cardSuit = _cardSuit;
+            cardValue = _cardNumber + _cardSuit;
         }
     }
 

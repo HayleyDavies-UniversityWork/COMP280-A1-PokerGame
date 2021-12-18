@@ -64,7 +64,7 @@ namespace Poker.Game
                 foreach (string j in Card.suits)
                 {
                     // create a new card and add it to the deck
-                    Card card = new Card($"{i}{j}");
+                    Card card = new Card(i, j);
                     cardsInDeck.Add(card);
                 }
             }
