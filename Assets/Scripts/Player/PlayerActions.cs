@@ -67,12 +67,13 @@ namespace Poker.Game.Players
 
         void EnableUI()
         {
-            if (gameController.currentBet == 0)
+            if (gameController.currentBet == 0 || gameController.currentBet == spendThisRound)
             {
                 checkButton.GetComponentInChildren<TextMeshProUGUI>().text = "Check";
             }
             else
             {
+                Debug.Log($"{gameController.currentBet} | {spendThisRound}");
                 checkButton.GetComponentInChildren<TextMeshProUGUI>().text = $"Call ${gameController.currentBet - spendThisRound}";
             }
             EnableButton(checkButton);

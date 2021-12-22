@@ -157,17 +157,17 @@ namespace Poker.Game
         {
             currentBet = gameSettings.bigBlind;
             currentPlayerIndex = dealerID;
+            dealerID++;
             DealCards();
             PlayBlinds();
-            dealerID++;
             NextPlayer();
         }
 
         void PlayBlinds()
         {
-            lastPlayer = GetFinalPlayer();
             IncrementCurrentPlayer();
             pokerTable.playerList[currentPlayerIndex].TakeMoney(gameSettings.smallBlind);
+            lastPlayer = GetFinalPlayer();
             IncrementCurrentPlayer();
             pokerTable.playerList[currentPlayerIndex].TakeMoney(gameSettings.bigBlind);
         }
@@ -213,6 +213,7 @@ namespace Poker.Game
             {
                 currentPlayerIndex = 0;
             }
+            //Debugger.Error($"Current player: {currentPlayerIndex}");
         }
 
         void DecrementCurrentPlayer()

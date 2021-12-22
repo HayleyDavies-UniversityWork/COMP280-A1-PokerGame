@@ -41,8 +41,8 @@ namespace Poker.Game.Players
             }
             player.table.AddToPot(amount, player, newPot);
             player.money -= amount;
-            Debugger.Log($"Player {player.number} added {amount} to pot. New pot? {newPot}");
             player.actions.spendThisRound += amount;
+            Debugger.Log($"Player {player.number} added {amount} to pot. New pot? {newPot}");
         }
 
         public static void WinMoney(this Player player)

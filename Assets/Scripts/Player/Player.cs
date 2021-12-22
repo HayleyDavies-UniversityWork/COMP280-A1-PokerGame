@@ -25,6 +25,7 @@ namespace Poker.Game.Players
 
             controller = _controller;
             display = controller.playerDisplays[number];
+            display.player = this;
             actions = controller.allPlayers[number];
 
             display.gameObject.SetActive(true);

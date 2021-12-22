@@ -1,6 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
+using TMPro;
 
 
 namespace Poker.Game.Display
@@ -9,6 +11,8 @@ namespace Poker.Game.Display
     public class DisplayPlayer : MonoBehaviour
     {
         public List<DisplayCard> handCards;
+        public TextMeshProUGUI bank;
+        public Player player;
 
         // Start is called before the first frame update
         void Start()
@@ -19,7 +23,10 @@ namespace Poker.Game.Display
         // Update is called once per frame
         void Update()
         {
-
+            if (player != null)
+            {
+                bank.text = $"${player.money}";
+            }
         }
     }
 }

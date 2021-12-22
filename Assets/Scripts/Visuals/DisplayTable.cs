@@ -21,7 +21,7 @@ namespace Poker.Game.Display
         {
             if (pokerTable != null)
             {
-                potSize.text = $"Pot: {pokerTable.GetTotalPot()}";
+                potSize.text = $"Pot:\n${pokerTable.GetTotalPot()}";
             }
         }
     }
