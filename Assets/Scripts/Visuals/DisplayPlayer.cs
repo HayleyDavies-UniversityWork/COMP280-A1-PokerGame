@@ -1,15 +1,15 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using TMPro;
+
 
 namespace Poker.Game.Display
 {
-    public class DisplayTable : MonoBehaviour
+    using Players;
+    public class DisplayPlayer : MonoBehaviour
     {
-        public Table pokerTable;
+        public List<DisplayCard> handCards;
 
-        public TextMeshProUGUI potSize;
         // Start is called before the first frame update
         void Start()
         {
@@ -19,11 +19,7 @@ namespace Poker.Game.Display
         // Update is called once per frame
         void Update()
         {
-            if (pokerTable != null)
-            {
-                potSize.text = $"Pot: {pokerTable.GetTotalPot()}";
-            }
+
         }
     }
-
 }

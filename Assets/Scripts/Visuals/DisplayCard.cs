@@ -10,9 +10,11 @@ namespace Poker.Game.Display
         public GameObject cardFront;
         public GameObject cardBack;
         public TextMeshProUGUI cardDetails;
+        public float rotationSpeed = 1f;
         Card card;
 
         bool displayFront = false;
+        public bool showToPlayer = false;
 
         // Start is called before the first frame update
         void Start()
@@ -22,29 +24,34 @@ namespace Poker.Game.Display
 
         void Initialize()
         {
-
+            this.GetComponent<Canvas>().enabled = false;
         }
 
-        // Update is called once per frame
-        void Update()
+        IEnumerator FlipCard(float finalRot)
         {
-            if (card != null)
-            {
-                var yRot = transform.rotation.eulerAngles.y % 360;
-                yRot = Mathf.Sign(yRot) * yRot;
+            Vector3 rotation = transform.localRotation.eulerAngles;
+            rotation.y += rotationSpeed;
+            transform.localRotation = Quaternion.Euler(rotation);
 
-                if (yRot > 90 && yRot < 270)
-                {
-                    displayFront = true;
-                    cardBack.SetActive(false);
-                    cardFront.SetActive(true);
-                }
-                else
-                {
-                    displayFront = false;
-                    cardBack.SetActive(true);
-                    cardFront.SetActive(false);
-                }
+
+            if (rotation.y > 90 && rotation.y < 270)
+            {
+                displayFront = true;
+                cardBack.SetActive(false);
+                cardFront.SetActive(true);
+            }
+            else
+            {
+                displayFront = false;
+                cardBack.SetActive(true);
+                cardFront.SetActive(false);
+            }
+
+            yield return new WaitForEndOfFrame();
+
+            if (rotation.y < finalRot)
+            {
+                StartCoroutine(FlipCard(finalRot));
             }
         }
 
@@ -53,6 +60,11 @@ namespace Poker.Game.Display
             card = _card;
             cardDetails.text = _card.cardValue;
             cardDetails.color = Card.suitColor[_card.cardSuit];
+            this.GetComponent<Canvas>().enabled = true;
+            if (showToPlayer)
+            {
+                StartCoroutine(FlipCard(180));
+            }
         }
     }
 

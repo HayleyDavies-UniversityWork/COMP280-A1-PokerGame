@@ -4,6 +4,7 @@ using UnityEngine;
 
 namespace Poker.Game
 {
+    using Players;
     public class Table
     {
         public List<Player> playerList;
@@ -11,6 +12,7 @@ namespace Poker.Game
         public Deck deck;
 
         public List<int> pots;
+        public Dictionary<Player, int> totalInPots;
         public int currentPot;
 
         public Table(Player host)

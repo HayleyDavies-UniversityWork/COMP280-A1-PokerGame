@@ -5,6 +5,7 @@ using UnityEngine;
 namespace Poker.Game
 {
     using Utils;
+    using Players;
     public static class TableExtensions
     {
         /// <summary>
@@ -90,6 +91,21 @@ namespace Poker.Game
         public static void AddToPot(this Table table, int amount, Player player)
         {
             table.AddToPot(amount, player, false);
+        }
+
+        public static int GetTotalPot(this Table table)
+        {
+            int total = 0;
+            foreach (int i in table.pots)
+            {
+                total += i;
+            }
+            return total;
+        }
+
+        public static Player FindWinner(this Table table)
+        {
+            return null;
         }
     }
 }

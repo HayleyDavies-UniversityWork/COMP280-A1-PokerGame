@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Poker.Game
+namespace Poker.Game.Players
 {
     using Utils;
     public static class PlayerExtensions
@@ -41,7 +41,21 @@ namespace Poker.Game
             }
             player.table.AddToPot(amount, player, newPot);
             player.money -= amount;
-            Debugger.Log($"Player {player.number} added {player.money} to pot. New pot? {newPot}");
+            Debugger.Log($"Player {player.number} added {amount} to pot. New pot? {newPot}");
+            player.actions.spendThisRound += amount;
+        }
+
+        public static void WinMoney(this Player player)
+        {
+            int winAmount = 0;
+            foreach (int i in player.table.pots)
+            {
+                player.money += i;
+                winAmount += i;
+            }
+
+            player.table.pots = new List<int>();
+            Debugger.Log($"Player {player.number} won {winAmount}");
         }
     }
 }

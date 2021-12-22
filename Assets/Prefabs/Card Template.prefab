@@ -118,6 +118,8 @@ MonoBehaviour:
   cardFront: {fileID: 4620088809312515800}
   cardBack: {fileID: 4620088808555534546}
   cardDetails: {fileID: 4620088809714387898}
+  rotationSpeed: 5
+  showToPlayer: 1
 --- !u!1 &4620088808555534546
 GameObject:
   m_ObjectHideFlags: 0
