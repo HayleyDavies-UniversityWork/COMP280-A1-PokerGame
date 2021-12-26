@@ -8,7 +8,6 @@ namespace Poker.Game
     {
         // an array to store the card numbers
         public static string[] numbers = {
-            "A",
             "2",
             "3",
             "4",
@@ -20,7 +19,8 @@ namespace Poker.Game
             "10",
             "J",
             "Q",
-            "K"
+            "K",
+            "A"
         };
 
         // an array to store the card suits
@@ -38,14 +38,16 @@ namespace Poker.Game
             {"♦", Color.red}
         };
 
-        public string cardValue;
-        public string cardNumber;
-        public string cardSuit;
-        public Card(string _cardNumber, string _cardSuit)
+        public string Text;
+        public string Number;
+        public string Suit;
+        public int Value;
+        public Card(string number, string suit)
         {
-            cardNumber = _cardNumber;
-            cardSuit = _cardSuit;
-            cardValue = _cardNumber + _cardSuit;
+            Number = number;
+            Suit = suit;
+            Text = number + suit;
+            Value = number.IndexOf(number);
         }
     }
 

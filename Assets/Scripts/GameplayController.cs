@@ -147,10 +147,20 @@ namespace Poker.Game
                     nextStage = PokerStage.Reset;
                     break;
                 case PokerStage.Reset:
-                    pokerTable.FindWinner();
-                    StartGame();
+                    List<Player> winners = pokerTable.FindWinner();
+                    foreach (Player p in winners)
+                    {
+                        p.money += pokerTable.GetTotalPot() / winners.Count;
+                    }
+                    RestartGame();
                     break;
             }
+        }
+
+        void RestartGame()
+        {
+
+            StartGame();
         }
 
         void StagePreFlop()

@@ -86,7 +86,7 @@ namespace Poker.Game
 
             foreach (Card i in deck.shuffledCards)
             {
-                output += $"\n{i.cardValue}";
+                output += $"\n{i.Text}";
             }
 
             Debugger.Log(output);

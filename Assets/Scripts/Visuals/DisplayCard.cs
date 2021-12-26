@@ -58,8 +58,8 @@ namespace Poker.Game.Display
         public void SetCard(Card _card)
         {
             card = _card;
-            cardDetails.text = _card.cardValue;
-            cardDetails.color = Card.suitColor[_card.cardSuit];
+            cardDetails.text = _card.Text;
+            cardDetails.color = Card.suitColor[_card.Suit];
             this.GetComponent<Canvas>().enabled = true;
             if (showToPlayer)
             {

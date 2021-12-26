@@ -19,7 +19,7 @@ namespace Poker.Game.Players
                 if (player.hand[i] == null)
                 {
                     player.hand[i] = card;
-                    Debugger.Log($"Added {card.cardValue}. Player: {player.number}. Hand Position: {i}.");
+                    Debugger.Log($"Added {card.Text}. Player: {player.number}. Hand Position: {i}.");
                     return;
                 }
             }

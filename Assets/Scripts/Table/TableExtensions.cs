@@ -20,7 +20,7 @@ namespace Poker.Game
                 if (table.cards[i] == null)
                 {
                     table.cards[i] = card;
-                    Debugger.Log($"Added {card.cardValue}. Table. Card Position: {i}.");
+                    Debugger.Log($"Added {card.Text}. Table. Card Position: {i}.");
                 }
             }
             Debugger.Warn($"Trying to overfill table.");
@@ -103,9 +103,41 @@ namespace Poker.Game
             return total;
         }
 
-        public static Player FindWinner(this Table table)
+        public static List<Player> FindWinner(this Table table)
         {
-            return null;
+            List<Player> winners = new List<Player>();
+            int winningHandStrength = 0;
+            Hands winningHand = Hands.HighCard;
+            Dictionary<Player, HandValue> handValues = new Dictionary<Player, HandValue>();
+            foreach (Player p in table.playerList)
+            {
+                if (!p.actions.isOut)
+                {
+                    handValues.Add(p, HandEvaluation.EvaluateHand(table.cards, p.hand));
+
+                    if (handValues[p].Hand > winningHand)
+                    {
+                        winners.Clear();
+                        winners.Add(p);
+                        winningHandStrength = handValues[p].Total;
+                    }
+                    else if (handValues[p].Hand == winningHand)
+                    {
+                        if (handValues[p].Total > winningHandStrength)
+                        {
+                            winners.Clear();
+                            winners.Add(p);
+                            winningHandStrength = handValues[p].Total;
+                        }
+                        else if (handValues[p].Total == winningHandStrength)
+                        {
+                            winners.Add(p);
+                        }
+                    }
+                }
+            }
+
+            return winners;
         }
     }
 }
