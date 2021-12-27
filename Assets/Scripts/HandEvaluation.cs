@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Linq;
 
 namespace Poker.Game.Utils
 {
@@ -29,8 +30,9 @@ namespace Poker.Game.Utils
             List<Card> cards = new List<Card>(tableCards);
             cards.AddRange(handCards);
             cards = SortCardsByValue(cards);
+            Dictionary<int, int> cardCounts = CountCards(cards);
 
-            if ((handValue = FourKind(cards)).Hand != Hands.FourKind)
+            if ((handValue = FindRelated(cardCounts)).Hand != Hands.FourKind)
             {
 
             }
@@ -68,32 +70,77 @@ namespace Poker.Game.Utils
             return sortedCards;
         }
 
-        static HandValue FourKind(List<Card> cards)
+        static Dictionary<int, int> CountCards(List<Card> cards)
         {
-            HandValue handValue = new HandValue();
-            List<int> blacklist = new List<int>();
-
-            for (int i = 0; i < cards.Count; i++)
+            Dictionary<int, int> cardCounts = new Dictionary<int, int>();
+            foreach (Card c in cards)
             {
-                int cardCount = 0;
-                if (!blacklist.Contains(i))
+                if (cardCounts.ContainsKey(c.Value))
                 {
-                    for (int j = i; j < cards.Count; j++)
-                    {
-                        if (cards[i].Value == cards[j].Value)
-                        {
-                            cardCount++;
-                            blacklist.Add(j);
-                        }
-                    }
-                    if (cardCount == 4)
-                    {
-                        handValue.Hand = Hands.FourKind;
-                        handValue.Total = cards[i].Value * 4;
-                        return handValue;
-                    }
+                    cardCounts[c.Value]++;
+                }
+                else
+                {
+                    cardCounts.Add(c.Value, 1);
                 }
             }
+
+            return cardCounts;
+        }
+
+        static HandValue FindRelated(Dictionary<int, int> cardCounts)
+        {
+            HandValue handValue = new HandValue();
+            int highestCount = 0;
+            int handStrength = 0;
+            bool hasFullHouse = false;
+            bool hasTwoPair = false;
+
+            foreach (KeyValuePair<int, int> i in cardCounts.Reverse())
+            {
+                if ((highestCount == 2 && i.Value == 3)
+              || (highestCount == 3 && i.Value == 2) && !hasFullHouse)
+                {
+
+                    handStrength += i.Key * i.Value;
+                    hasFullHouse = true;
+                    break;
+                }
+                else if (i.Value > highestCount)
+                {
+                    highestCount = i.Value;
+                    handStrength = i.Key * i.Value;
+                }
+                else if (highestCount == 2 && i.Value == 2 && !hasTwoPair)
+                {
+                    handStrength += i.Key * i.Value;
+                    hasTwoPair = true;
+                }
+            }
+
+            handValue.Total = handStrength;
+
+            if (highestCount == 4)
+            {
+                handValue.Hand = Hands.FourKind;
+            }
+            else if (hasFullHouse)
+            {
+                handValue.Hand = Hands.FullHouse;
+            }
+            else if (highestCount == 3)
+            {
+                handValue.Hand = Hands.ThreeKind;
+            }
+            else if (hasTwoPair)
+            {
+                handValue.Hand = Hands.TwoPair;
+            }
+            else if (highestCount == 2)
+            {
+                handValue.Hand = Hands.OnePair;
+            }
+
             return handValue;
         }
     }
