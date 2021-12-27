@@ -15,6 +15,7 @@ namespace Poker.Game.Display
 
         bool displayFront = false;
         public bool showToPlayer = false;
+        private Quaternion startRotation;
 
         // Start is called before the first frame update
         void Start()
@@ -25,6 +26,7 @@ namespace Poker.Game.Display
         void Initialize()
         {
             this.GetComponent<Canvas>().enabled = false;
+            startRotation = transform.rotation;
         }
 
         IEnumerator FlipCard(float finalRot)
@@ -61,10 +63,18 @@ namespace Poker.Game.Display
             cardDetails.text = _card.Text;
             cardDetails.color = Card.suitColor[_card.Suit];
             this.GetComponent<Canvas>().enabled = true;
+            transform.rotation = startRotation;
             if (showToPlayer)
             {
                 StartCoroutine(FlipCard(180));
             }
+        }
+
+        public void Setup()
+        {
+            transform.rotation = startRotation;
+            StartCoroutine(FlipCard(0));
+            this.GetComponent<Canvas>().enabled = false;
         }
     }
 

@@ -17,14 +17,7 @@ namespace Poker.Game
 
         public Table(Player host)
         {
-            cards = new Card[5];
-            deck = new Deck();
-
-            pots = new List<int>() {
-                0
-            };
-
-            currentPot = 0;
+            this.Setup();
 
             playerList = new List<Player>();
             this.AddPlayer(host);

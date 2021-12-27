@@ -147,11 +147,6 @@ namespace Poker.Game
                     nextStage = PokerStage.Reset;
                     break;
                 case PokerStage.Reset:
-                    List<Player> winners = pokerTable.FindWinner();
-                    foreach (Player p in winners)
-                    {
-                        p.money += pokerTable.GetTotalPot() / winners.Count;
-                    }
                     RestartGame();
                     break;
             }
@@ -159,6 +154,25 @@ namespace Poker.Game
 
         void RestartGame()
         {
+            List<Player> winners = pokerTable.FindWinner();
+            int totalPot = pokerTable.GetTotalPot();
+
+            foreach (Player p in pokerTable.playerList)
+            {
+                if (winners.Contains(p))
+                {
+                    p.money += totalPot / winners.Count;
+                    Debug.LogError($"Player {p.number} wins {totalPot / winners.Count}");
+                }
+                p.Setup();
+            }
+
+            foreach (DisplayCard c in tableCards)
+            {
+                c.Setup();
+            }
+
+            pokerTable.Setup();
 
             StartGame();
         }
@@ -219,14 +233,14 @@ namespace Poker.Game
             }
             return pokerTable.playerList[currentPlayerIndex - 1];
         }
+
         void IncrementCurrentPlayer()
         {
             currentPlayerIndex++;
-            if (currentPlayerIndex == pokerTable.playerList.Count)
+            if (currentPlayerIndex >= pokerTable.playerList.Count)
             {
                 currentPlayerIndex = 0;
             }
-            //Debugger.Error($"Current player: {currentPlayerIndex}");
         }
 
         void DecrementCurrentPlayer()

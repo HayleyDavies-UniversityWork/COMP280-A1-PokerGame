@@ -107,6 +107,7 @@ namespace Poker.Game
         {
             List<Player> winners = new List<Player>();
             int winningHandStrength = 0;
+            int highCardStrength = 0;
             Hands winningHand = Hands.HighCard;
             Dictionary<Player, HandValue> handValues = new Dictionary<Player, HandValue>();
             foreach (Player p in table.playerList)
@@ -115,13 +116,14 @@ namespace Poker.Game
                 {
                     handValues.Add(p, HandEvaluation.EvaluateHand(table.cards, p.hand));
 
-                    Debugger.Error($"Player {p.number} | Hand: {handValues[p].Hand} | Value: {handValues[p].Total}");
+                    Debugger.Error($"Player {p.number} | Hand: {handValues[p].Hand} | Value: {handValues[p].Total} | High Card: {handValues[p].HighCardTotal}");
 
                     if (handValues[p].Hand > winningHand)
                     {
                         winners.Clear();
                         winners.Add(p);
                         winningHandStrength = handValues[p].Total;
+                        highCardStrength = handValues[p].HighCardTotal;
                     }
                     else if (handValues[p].Hand == winningHand)
                     {
@@ -133,13 +135,34 @@ namespace Poker.Game
                         }
                         else if (handValues[p].Total == winningHandStrength)
                         {
-                            winners.Add(p);
+                            if (handValues[p].HighCardTotal > highCardStrength)
+                            {
+                                winners.Clear();
+                                winners.Add(p);
+                                highCardStrength = handValues[p].HighCardTotal;
+                            }
+                            else if (handValues[p].HighCardTotal == highCardStrength)
+                            {
+                                winners.Add(p);
+                            }
                         }
                     }
                 }
             }
 
             return winners;
+        }
+
+        public static void Setup(this Table table)
+        {
+            table.cards = new Card[5];
+            table.deck = new Deck();
+
+            table.pots = new List<int>() {
+                0
+            };
+
+            table.currentPot = 0;
         }
     }
 }

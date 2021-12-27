@@ -23,6 +23,8 @@ namespace Poker.Game.Utils
     {
         public Hands Hand;
         public int Total;
+
+        public int HighCardTotal;
     }
     public static class HandEvaluation
     {
@@ -175,9 +177,9 @@ namespace Poker.Game.Utils
                 handValue.Hand = Hands.HighCard;
             }
 
-            for (int i = 0; i < 5 - highestCount; i++)
+            for (int i = 0; i < highCardCount; i++)
             {
-                handStrength += highCardValues[i];
+                handValue.HighCardTotal += highCardValues[i];
             }
 
             handValue.Total = handStrength;

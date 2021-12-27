@@ -57,5 +57,10 @@ namespace Poker.Game.Players
             player.table.pots = new List<int>();
             Debugger.Log($"Player {player.number} won {winAmount}");
         }
+
+        public static void Setup(this Player player)
+        {
+            player.hand = new Card[2];
+        }
     }
 }
