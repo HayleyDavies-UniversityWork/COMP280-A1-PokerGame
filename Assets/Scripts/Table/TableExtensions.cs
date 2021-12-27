@@ -115,6 +115,8 @@ namespace Poker.Game
                 {
                     handValues.Add(p, HandEvaluation.EvaluateHand(table.cards, p.hand));
 
+                    Debugger.Error($"Player {p.number} | Hand: {handValues[p].Hand} | Value: {handValues[p].Total}");
+
                     if (handValues[p].Hand > winningHand)
                     {
                         winners.Clear();

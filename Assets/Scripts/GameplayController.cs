@@ -190,6 +190,7 @@ namespace Poker.Game
             {
                 Card card = pokerTable.deck.DealCard();
                 tableCards[i].SetCard(card);
+                pokerTable.cards[i] = card;
             }
             NextPlayer();
         }
@@ -198,6 +199,7 @@ namespace Poker.Game
         {
             Card card = pokerTable.deck.DealCard();
             tableCards[3].SetCard(card);
+            pokerTable.cards[3] = card;
             NextPlayer();
         }
 
@@ -205,6 +207,7 @@ namespace Poker.Game
         {
             Card card = pokerTable.deck.DealCard();
             tableCards[4].SetCard(card);
+            pokerTable.cards[4] = card;
             NextPlayer();
         }
 

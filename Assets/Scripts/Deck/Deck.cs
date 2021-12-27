@@ -59,9 +59,9 @@ namespace Poker.Game
             // create a new list of cards
             List<Card> cardsInDeck = new List<Card>();
             // for all suit and number combinations
-            foreach (string i in Card.numbers)
+            foreach (string i in Card.numbers.Keys)
             {
-                foreach (string j in Card.suits)
+                foreach (string j in Card.suits.Keys)
                 {
                     // create a new card and add it to the deck
                     Card card = new Card(i, j);

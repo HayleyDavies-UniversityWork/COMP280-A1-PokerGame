@@ -14,7 +14,9 @@ namespace Poker.Game.Utils
         Straight,
         Flush,
         FullHouse,
-        FourKind
+        FourKind,
+        StraightFlush,
+        RoyalFlush
     }
 
     public struct HandValue
@@ -27,14 +29,37 @@ namespace Poker.Game.Utils
         public static HandValue EvaluateHand(Card[] tableCards, Card[] handCards)
         {
             HandValue handValue = new HandValue();
-            List<Card> cards = new List<Card>(tableCards);
-            cards.AddRange(handCards);
+            HandValue tempHandValue = new HandValue();
+            List<Card> cards = new List<Card>(handCards).Concat(tableCards).ToList();
             cards = SortCardsByValue(cards);
-            Dictionary<int, int> cardCounts = CountCards(cards);
 
-            if ((handValue = FindRelated(cardCounts)).Hand != Hands.FourKind)
+            List<Card> straightCards;
+
+            tempHandValue = FindRelated(cards);
+
+            if (HasStraight(cards, out straightCards, out handValue))
             {
+                if (HasFlush(straightCards, out handValue))
+                {
+                    handValue.Hand = Hands.StraightFlush;
+                    if (straightCards[0].Value == (int)Card.NumberEnum.Ten && straightCards.Last().Value == (int)Card.NumberEnum.Ace)
+                    {
+                        handValue.Hand = Hands.RoyalFlush;
+                    }
+                }
+            }
 
+            if (handValue.Hand < tempHandValue.Hand)
+            {
+                handValue = tempHandValue;
+            }
+
+            if (HasFlush(cards, out tempHandValue))
+            {
+                if (tempHandValue.Hand > handValue.Hand)
+                {
+                    handValue = tempHandValue;
+                }
             }
 
             return handValue;
@@ -44,27 +69,9 @@ namespace Poker.Game.Utils
         {
             List<Card> sortedCards = new List<Card>();
 
-            foreach (Card c in cards)
+            foreach (Card c in cards.OrderBy(c => c.Value))
             {
-                if (sortedCards.Count == 0)
-                {
-                    sortedCards.Add(c);
-                }
-                else
-                {
-                    for (int i = 0; i < sortedCards.Count; i++)
-                    {
-                        if (c.Value < sortedCards[i].Value)
-                        {
-                            sortedCards.Insert(i, c);
-                            break;
-                        }
-                        else if (i == sortedCards.Count)
-                        {
-                            sortedCards.Add(c);
-                        }
-                    }
-                }
+                sortedCards.Add(c);
             }
 
             return sortedCards;
@@ -72,12 +79,13 @@ namespace Poker.Game.Utils
 
         static Dictionary<int, int> CountCards(List<Card> cards)
         {
+            cards.Reverse();
             Dictionary<int, int> cardCounts = new Dictionary<int, int>();
             foreach (Card c in cards)
             {
                 if (cardCounts.ContainsKey(c.Value))
                 {
-                    cardCounts[c.Value]++;
+                    cardCounts[c.Value] = cardCounts[c.Value] + 1;
                 }
                 else
                 {
@@ -88,20 +96,31 @@ namespace Poker.Game.Utils
             return cardCounts;
         }
 
-        static HandValue FindRelated(Dictionary<int, int> cardCounts)
+        static HandValue FindRelated(List<Card> cards)
         {
+            Dictionary<int, int> cardCounts = CountCards(cards);
+
+            List<int> cardValues = new List<int>();
+            foreach (Card c in cards)
+            {
+                cardValues.Insert(0, c.Value);
+            }
+
+            List<int> highCardValues = cardValues;
+
             HandValue handValue = new HandValue();
+
             int highestCount = 0;
             int handStrength = 0;
+
             bool hasFullHouse = false;
             bool hasTwoPair = false;
 
-            foreach (KeyValuePair<int, int> i in cardCounts.Reverse())
+            foreach (KeyValuePair<int, int> i in cardCounts)
             {
-                if ((highestCount == 2 && i.Value == 3)
-              || (highestCount == 3 && i.Value == 2) && !hasFullHouse)
+                if (((highestCount == 2 && i.Value == 3)
+              || (highestCount == 3 && i.Value == 2)) && !hasFullHouse)
                 {
-
                     handStrength += i.Key * i.Value;
                     hasFullHouse = true;
                     break;
@@ -110,15 +129,24 @@ namespace Poker.Game.Utils
                 {
                     highestCount = i.Value;
                     handStrength = i.Key * i.Value;
+                    highCardValues = cardValues;
+                    for (int j = 0; j < i.Value; j++)
+                    {
+                        highCardValues.Remove(i.Key);
+                    }
                 }
                 else if (highestCount == 2 && i.Value == 2 && !hasTwoPair)
                 {
                     handStrength += i.Key * i.Value;
                     hasTwoPair = true;
+                    for (int j = 0; j < i.Value; j++)
+                    {
+                        highCardValues.Remove(i.Key);
+                    }
                 }
             }
 
-            handValue.Total = handStrength;
+            int highCardCount = 5 - highestCount;
 
             if (highestCount == 4)
             {
@@ -127,6 +155,7 @@ namespace Poker.Game.Utils
             else if (hasFullHouse)
             {
                 handValue.Hand = Hands.FullHouse;
+                highCardCount = 0;
             }
             else if (highestCount == 3)
             {
@@ -135,13 +164,113 @@ namespace Poker.Game.Utils
             else if (hasTwoPair)
             {
                 handValue.Hand = Hands.TwoPair;
+                highCardCount = 1;
             }
             else if (highestCount == 2)
             {
                 handValue.Hand = Hands.OnePair;
             }
+            else
+            {
+                handValue.Hand = Hands.HighCard;
+            }
+
+            for (int i = 0; i < 5 - highestCount; i++)
+            {
+                handStrength += highCardValues[i];
+            }
+
+            handValue.Total = handStrength;
 
             return handValue;
         }
+
+        static bool HasFlush(List<Card> cards, out HandValue handValue)
+        {
+            handValue = new HandValue();
+            List<int> suitCounts = new List<int> { 0, 0, 0, 0 };
+            Dictionary<int, List<int>> suitsOfCards = new Dictionary<int, List<int>>();
+            foreach (Card c in cards)
+            {
+                int suitEnumAsInt = (int)c.SuitValue;
+                suitCounts[suitEnumAsInt]++;
+                if (!suitsOfCards.ContainsKey(suitEnumAsInt))
+                {
+                    suitsOfCards.Add(suitEnumAsInt, new List<int>());
+                }
+                suitsOfCards[suitEnumAsInt].Add(c.Value);
+            }
+
+            for (int i = 0; i < suitCounts.Count; i++)
+            {
+                if (suitCounts[i] >= 5)
+                {
+                    for (int j = 0; j < 5; j++)
+                    {
+                        handValue.Total += suitsOfCards[i][j];
+                    }
+                    handValue.Hand = Hands.Flush;
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        static bool HasStraight(List<Card> cards, out List<Card> straightCards, out HandValue handValue)
+        {
+            handValue = new HandValue();
+            straightCards = new List<Card>();
+            List<int> uniqueCardValues = new List<int>();
+            int handStrength = 0;
+
+
+            int lastValue = cards[0].Value;
+            if (cards[0].Value == (int)Card.NumberEnum.Two &&
+            cards.Last().Value == (int)Card.NumberEnum.Ace)
+            {
+                straightCards.Add(cards.Last());
+                uniqueCardValues.Add(cards.Last().Value);
+            }
+
+            for (int i = 0; i < cards.Count; i++)
+            {
+                Card card = cards[i];
+                if (card.Value == lastValue || card.Value == lastValue + 1)
+                {
+                    straightCards.Add(card);
+                    lastValue = card.Value;
+                    if (card.Value == lastValue + 1)
+                    {
+                        uniqueCardValues.Add(card.Value);
+                    }
+                }
+                else if (uniqueCardValues.Count < 5 && cards.Count() - i >= 5)
+                {
+                    straightCards = new List<Card>();
+                    uniqueCardValues = new List<int>();
+                    straightCards.Add(card);
+                }
+                else
+                {
+                    break;
+                }
+            }
+
+            if (straightCards.Count >= 5)
+            {
+                handStrength = uniqueCardValues.Sum();
+                if (straightCards[0].Value == (int)Card.NumberEnum.Ace)
+                {
+                    handStrength -= ((int)Card.NumberEnum.Ace - 1);
+                }
+                handValue.Total = handStrength;
+                handValue.Hand = Hands.Straight;
+                return true;
+            }
+
+            return false;
+        }
+
     }
 }

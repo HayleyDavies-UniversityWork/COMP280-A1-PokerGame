@@ -17,6 +17,7 @@ namespace Poker.Game
 
         public Table(Player host)
         {
+            cards = new Card[5];
             deck = new Deck();
 
             pots = new List<int>() {
