@@ -118,12 +118,13 @@ namespace Poker.Game
 
                     Debugger.Error($"Player {p.number} | Hand: {handValues[p].Hand} | Value: {handValues[p].Total} | High Card: {handValues[p].HighCardTotal}");
 
-                    if (handValues[p].Hand > winningHand)
+                    if ((int)handValues[p].Hand > (int)winningHand)
                     {
                         winners.Clear();
                         winners.Add(p);
                         winningHandStrength = handValues[p].Total;
                         highCardStrength = handValues[p].HighCardTotal;
+                        winningHand = handValues[p].Hand;
                     }
                     else if (handValues[p].Hand == winningHand)
                     {
