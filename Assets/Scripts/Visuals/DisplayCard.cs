@@ -29,25 +29,24 @@ namespace Poker.Game.Display
             startRotation = transform.rotation;
         }
 
-        IEnumerator FlipCard(float finalRot)
+        public IEnumerator FlipCard(float finalRot)
         {
             Vector3 rotation = transform.localRotation.eulerAngles;
             rotation.y += rotationSpeed;
             transform.localRotation = Quaternion.Euler(rotation);
 
+            Debug.LogWarning($"{rotation.y}");
 
-            if (rotation.y > 90 && rotation.y < 270)
+            if (rotation.y > 90f && rotation.y < 270f)
             {
                 displayFront = true;
-                cardBack.SetActive(false);
-                cardFront.SetActive(true);
             }
             else
             {
                 displayFront = false;
-                cardBack.SetActive(true);
-                cardFront.SetActive(false);
             }
+            cardBack.SetActive(!displayFront);
+            cardFront.SetActive(displayFront);
 
             yield return new WaitForEndOfFrame();
 

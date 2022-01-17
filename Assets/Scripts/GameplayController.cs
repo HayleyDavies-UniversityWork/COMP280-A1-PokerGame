@@ -38,8 +38,9 @@ namespace Poker.Game
         int dealerID = 0;
         // players to track directly internally
         Player host, lastPlayer;
-
         public Queue<Player> playerQueue;
+        public List<Player> foldedPlayers = new List<Player>();
+
         [Header("Other Table Options")]
         public DebugMode debugMode;
         PokerStage nextStage = PokerStage.PreFlop;
@@ -94,7 +95,9 @@ namespace Poker.Game
                 case PlayerOption.Call:
                     break;
                 case PlayerOption.Fold:
+                    foldedPlayers.Add(currentPlayer);
                     RemovePlayer(currentPlayer);
+                    lastPlayer = GetNextPlayer();
                     break;
             }
             if (currentPlayer == lastPlayer)
@@ -114,7 +117,7 @@ namespace Poker.Game
             pokerTable.playerList.Remove(currentPlayer);
             if (pokerTable.playerList.Count == 1)
             {
-                pokerTable.playerList[0].WinMoney();
+                nextStage = PokerStage.Reset;
             }
         }
 
@@ -147,14 +150,22 @@ namespace Poker.Game
                     nextStage = PokerStage.Reset;
                     break;
                 case PokerStage.Reset:
-                    RestartGame();
+                    StartCoroutine(RestartGame());
                     break;
             }
         }
 
-        void RestartGame()
+        IEnumerator RestartGame()
         {
-            List<Player> winners = pokerTable.FindWinner();
+            List<Player> winners = new List<Player>();
+            if (pokerTable.playerList.Count == 1)
+            {
+                winners.Add(pokerTable.playerList[0]);
+            }
+            else
+            {
+                winners = pokerTable.FindWinner();
+            }
             int totalPot = pokerTable.GetTotalPot();
 
             foreach (Player p in pokerTable.playerList)
@@ -162,9 +173,38 @@ namespace Poker.Game
                 if (winners.Contains(p))
                 {
                     p.money += totalPot / winners.Count;
-                    Debug.LogError($"Player {p.number} wins {totalPot / winners.Count}");
+                    Debugger.Log($"Player {p.number} wins {totalPot / winners.Count}");
                 }
+            }
+
+            foreach (Player p in foldedPlayers)
+            {
+                pokerTable.playerList.Insert(p.number, p);
+            }
+
+            foreach (Player p in pokerTable.playerList)
+            {
+                foreach (DisplayCard c in p.display.handCards)
+                {
+                    if (c.showToPlayer == false)
+                    {
+                        StartCoroutine(c.FlipCard(180));
+                    }
+                }
+            }
+
+            yield return new WaitForSeconds(5);
+
+            foreach (Player p in pokerTable.playerList)
+            {
                 p.Setup();
+                foreach (DisplayCard c in p.display.handCards)
+                {
+                    if (c.showToPlayer == false)
+                    {
+                        StartCoroutine(c.FlipCard(0));
+                    }
+                }
             }
 
             foreach (DisplayCard c in tableCards)
@@ -173,6 +213,8 @@ namespace Poker.Game
             }
 
             pokerTable.Setup();
+
+            foldedPlayers = new List<Player>();
 
             StartGame();
         }
@@ -232,6 +274,16 @@ namespace Poker.Game
                 return pokerTable.playerList[pokerTable.playerList.Count - 1];
             }
             return pokerTable.playerList[currentPlayerIndex - 1];
+        }
+
+        Player GetNextPlayer()
+        {
+            int playerIndex = currentPlayerIndex + 1;
+            if (playerIndex >= pokerTable.playerList.Count)
+            {
+                playerIndex = 0;
+            }
+            return pokerTable.playerList[playerIndex];
         }
 
         void IncrementCurrentPlayer()

@@ -29,19 +29,25 @@ namespace Poker.Game.Players
         public int moneyInPot;
         public int spendThisRound;
 
-        GameplayController gameController;
+        public GameplayController gameController;
 
         public PlayerOption option;
 
+        public PlayerUI playerUI;
+
         public Button betButton;
         public Button checkButton;
-        public Button checkFoldButton;
         public TMP_InputField betAmount;
 
         Coroutine timer;
 
         private void Start()
         {
+            if (isPlayer)
+            {
+                playerUI = GetComponentInChildren<PlayerUI>();
+                playerUI.playerActions = this;
+            }
         }
 
         public void PlayerTurn(GameplayController controller, Player currentPlayer)
@@ -52,7 +58,7 @@ namespace Poker.Game.Players
 
             if (isPlayer)
             {
-                EnableUI();
+                playerUI.EnableUI();
                 timer = StartCoroutine(PlayerTimeout(30));
                 if (isActionQueued)
                 {
@@ -65,29 +71,17 @@ namespace Poker.Game.Players
             }
         }
 
-        void EnableUI()
-        {
-            if (gameController.currentBet == 0 || gameController.currentBet == spendThisRound)
-            {
-                checkButton.GetComponentInChildren<TextMeshProUGUI>().text = "Check";
-            }
-            else
-            {
-                Debug.Log($"{gameController.currentBet} | {spendThisRound}");
-                checkButton.GetComponentInChildren<TextMeshProUGUI>().text = $"Call ${gameController.currentBet - spendThisRound}";
-            }
-            EnableButton(checkButton);
-            EnableButton(betButton);
-        }
-
-        void EndTurn()
+        IEnumerator EndTurn()
         {
             if (isPlayer)
             {
-                DisableButton(checkButton);
-                DisableButton(betButton);
-                StopCoroutine(timer);
+                playerUI.DisableUI();
+                if (timer != null)
+                {
+                    StopCoroutine(timer);
+                }
             }
+            yield return new WaitForSeconds(0.1f);
             isTurn = false;
             gameController.EndPlayerTurn(player);
         }
@@ -97,7 +91,7 @@ namespace Poker.Game.Players
             option = PlayerOption.Call;
             player.TakeMoney(gameController.currentBet - spendThisRound);
 
-            EndTurn();
+            StartCoroutine(EndTurn());
         }
 
         public void Bet()
@@ -109,7 +103,7 @@ namespace Poker.Game.Players
                 player.TakeMoney(amount);
                 gameController.currentBet = amount;
 
-                EndTurn();
+                StartCoroutine(EndTurn());
             }
         }
 
@@ -157,7 +151,7 @@ namespace Poker.Game.Players
                 isOut = true;
             }
 
-            EndTurn();
+            StartCoroutine(EndTurn());
         }
 
         void QueueAction(UnityAction actionToQueue)
@@ -185,16 +179,6 @@ namespace Poker.Game.Players
             {
                 Fold();
             }
-        }
-
-        void DisableButton(Button button)
-        {
-            button.interactable = false;
-        }
-
-        void EnableButton(Button button)
-        {
-            button.interactable = true;
         }
     }
 }

@@ -70,6 +70,11 @@ namespace Poker.Game
         /// <param name="inNewPot">create a new pot?</param>
         public static void AddToPot(this Table table, int amount, Player player, bool inNewPot)
         {
+            if (table.pots.Count == 0)
+            {
+                table.pots.Add(0);
+            }
+
             if (inNewPot)
             {
                 table.currentPot++;
@@ -116,7 +121,7 @@ namespace Poker.Game
                 {
                     handValues.Add(p, HandEvaluation.EvaluateHand(table.cards, p.hand));
 
-                    Debugger.Error($"Player {p.number} | Hand: {handValues[p].Hand} | Value: {handValues[p].Total} | High Card: {handValues[p].HighCardTotal}");
+                    Debugger.Log($"Player {p.number} | Hand: {handValues[p].Hand} | Value: {handValues[p].Total} | High Card: {handValues[p].HighCardTotal}");
 
                     if ((int)handValues[p].Hand > (int)winningHand)
                     {
