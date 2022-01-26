@@ -6,6 +6,7 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
 using TMPro;
+using BeardedManStudios.Forge.Networking.Generated;
 
 namespace Poker.Game.Players
 {
@@ -17,7 +18,7 @@ namespace Poker.Game.Players
         Fold
     }
 
-    public class PlayerActions : MonoBehaviour
+    public class PlayerActions : PlayerBehavior
     {
         public Player player;
 
