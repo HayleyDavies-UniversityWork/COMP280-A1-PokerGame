@@ -18,7 +18,7 @@ namespace Poker.Game.Players
         Fold
     }
 
-    public class PlayerActions : PlayerBehavior
+    public class PlayerActions : MonoBehaviour
     {
         public Player player;
 
