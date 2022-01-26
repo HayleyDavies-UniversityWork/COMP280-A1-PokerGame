@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 namespace Poker.Game
 {
@@ -27,6 +28,7 @@ namespace Poker.Game
         [SerializeField] Button startGameButton;
         [SerializeField] Canvas tableCardsCanvas;
         GameSettings gameSettings;
+        public List<Button> addAIButtons;
         public List<DisplayCard> tableCards;
 
 
@@ -59,6 +61,10 @@ namespace Poker.Game
             host = new Player(0, gameSettings.buyIn, this);
             pokerTable = new Table(host);
             tableDisplay.pokerTable = pokerTable;
+            foreach (Button b in addAIButtons)
+            {
+                b.interactable = true;
+            }
         }
 
         public void AddAI(int index)
@@ -74,6 +80,11 @@ namespace Poker.Game
         {
             nextStage = PokerStage.PreFlop;
             StartNextPhase();
+        }
+
+        public void LeaveGame()
+        {
+            SceneManager.LoadScene(SceneManager.GetActiveScene().name);
         }
 
         public void NextPlayer()
