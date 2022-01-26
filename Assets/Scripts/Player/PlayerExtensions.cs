@@ -5,6 +5,7 @@ using UnityEngine;
 namespace Poker.Game.Players
 {
     using Utils;
+    using Display;
     public static class PlayerExtensions
     {
         /// <summary>
@@ -61,6 +62,11 @@ namespace Poker.Game.Players
         public static void Setup(this Player player)
         {
             player.hand = new Card[2];
+            player.actions.isOut = false;
+            foreach (DisplayCard dc in player.display.handCards)
+            {
+                dc.Setup();
+            }
         }
     }
 }

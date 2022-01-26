@@ -25,8 +25,8 @@ namespace Poker.Game.Display
 
         void Initialize()
         {
-            this.GetComponent<Canvas>().enabled = false;
             startRotation = transform.rotation;
+            this.GetComponent<Canvas>().enabled = false;
         }
 
         public IEnumerator FlipCard(float finalRot)
@@ -34,8 +34,6 @@ namespace Poker.Game.Display
             Vector3 rotation = transform.localRotation.eulerAngles;
             rotation.y += rotationSpeed;
             transform.localRotation = Quaternion.Euler(rotation);
-
-            Debug.LogWarning($"{rotation.y}");
 
             if (rotation.y > 90f && rotation.y < 270f)
             {
@@ -74,6 +72,8 @@ namespace Poker.Game.Display
             transform.rotation = startRotation;
             StartCoroutine(FlipCard(0));
             this.GetComponent<Canvas>().enabled = false;
+            cardBack.SetActive(true);
+            cardFront.SetActive(false);
         }
     }
 
