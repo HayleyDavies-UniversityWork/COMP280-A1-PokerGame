@@ -3,12 +3,14 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
+using BeardedManStudios.Forge.Networking.Generated;
 
 namespace Poker.Game
 {
     using Utils;
     using Display;
     using Players;
+    using BeardedManStudios.Forge.Networking;
 
     enum PokerStage
     {
@@ -19,7 +21,7 @@ namespace Poker.Game
         Reset
     }
 
-    public class GameplayController : MonoBehaviour
+    public class GameplayController : GameplayControllerBehavior
     {
         [Header("Table Settings")]
         public int currentBet;
@@ -50,6 +52,10 @@ namespace Poker.Game
         // Start is called before the first frame update
         void Start()
         {
+            if (networkObject == null)
+            {
+                return;
+            }
             Initialize();
             startGameButton.interactable = false;
         }
@@ -60,6 +66,7 @@ namespace Poker.Game
             Debugger.SetDebugMode(debugMode);
             host = new Player(0, gameSettings.buyIn, this);
             pokerTable = new Table(host);
+            pokerTable.Setup(networkObject.deckSeed);
             tableDisplay.pokerTable = pokerTable;
             foreach (Button b in addAIButtons)
             {
@@ -223,7 +230,7 @@ namespace Poker.Game
                 c.Setup();
             }
 
-            pokerTable.Setup();
+            pokerTable.Setup(networkObject.deckSeed);
 
             foldedPlayers = new List<Player>();
 
@@ -326,6 +333,11 @@ namespace Poker.Game
                     p.display.handCards[i].SetCard(card);
                 }
             }
+        }
+
+        public override void SetDeckSeed(RpcArgs args)
+        {
+            throw new System.NotImplementedException();
         }
 
         // Update is called once per frame

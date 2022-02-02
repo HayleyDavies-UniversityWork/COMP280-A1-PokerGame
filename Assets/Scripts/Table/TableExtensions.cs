@@ -159,10 +159,10 @@ namespace Poker.Game
             return winners;
         }
 
-        public static void Setup(this Table table)
+        public static void Setup(this Table table, int deckSeed)
         {
             table.cards = new Card[5];
-            table.deck = new Deck();
+            table.deck = new Deck(deckSeed);
 
             table.pots = new List<int>() {
                 0

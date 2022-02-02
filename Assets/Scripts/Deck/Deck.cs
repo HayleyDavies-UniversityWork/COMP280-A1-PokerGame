@@ -15,12 +15,12 @@ namespace Poker.Game
         /// <summary>
         /// a collection which stores cards
         /// </summary>
-        public Deck()
+        public Deck(int seed)
         {
             // get all the cards
             allCards = GetAllCards();
             // and shuffle them
-            shuffledCards = Shuffle(this);
+            shuffledCards = Shuffle(this, seed);
         }
 
         /// <summary>
@@ -28,12 +28,12 @@ namespace Poker.Game
         /// </summary>
         /// <param name="deck">the deck to shuffle</param>
         /// <returns>a queue of the shuffled deck</returns>
-        public Queue<Card> Shuffle(Deck deck)
+        public Queue<Card> Shuffle(Deck deck, int seed)
         {
             Queue<Card> shuffle = new Queue<Card>();
 
             List<Card> cardsInDeck = new List<Card>(deck.allCards);
-            Random prng = new Random();
+            Random prng = new Random(seed);
 
             int cardsLength = deck.allCards.Count;
             // for all the values in the deck

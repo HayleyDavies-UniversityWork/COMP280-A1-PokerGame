@@ -21,6 +21,7 @@ namespace Poker.Game.Players
     public class PlayerActions : MonoBehaviour
     {
         public Player player;
+        public PlayerNetworkObject playerNetwork;
 
         public UnityAction queuedAction;
         public bool isActionQueued = false;
