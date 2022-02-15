@@ -71,8 +71,6 @@ namespace Poker.Game
         public int Value;
         public Card(string number, string suit)
         {
-
-
             Number = number;
             Suit = suit;
             SuitValue = suits[suit];

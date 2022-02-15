@@ -4,8 +4,8 @@ using UnityEngine;
 
 namespace BeardedManStudios.Forge.Networking.Generated
 {
-	[GeneratedRPC("{\"types\":[[\"string\", \"string\"][][]]")]
-	[GeneratedRPCVariableNames("{\"types\":[[\"card1Value\", \"card2Value\"][][]]")]
+	[GeneratedRPC("{\"types\":[[\"string\", \"string\"][][\"int\", \"int\"]]")]
+	[GeneratedRPCVariableNames("{\"types\":[[\"card1Value\", \"card2Value\"][][\"Action\", \"Money\"]]")]
 	public abstract partial class PlayerBehavior : NetworkBehavior
 	{
 		public const byte RPC_RECIEVE_CARD = 0 + 5;
@@ -26,7 +26,7 @@ namespace BeardedManStudios.Forge.Networking.Generated
 			base.SetupHelperRpcs(networkObject);
 			networkObject.RegisterRpc("RecieveCard", RecieveCard, typeof(string), typeof(string));
 			networkObject.RegisterRpc("JoinTable", JoinTable);
-			networkObject.RegisterRpc("SendPlayerAction", SendPlayerAction);
+			networkObject.RegisterRpc("SendPlayerAction", SendPlayerAction, typeof(int), typeof(int));
 
 			networkObject.onDestroy += DestroyGameObject;
 

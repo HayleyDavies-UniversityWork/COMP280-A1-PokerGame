@@ -41,6 +41,10 @@ namespace Poker.Game.Players
             }
         }
 
+        public void LocalAction(int action, int money) {
+            networkObject.SendRpc(RPC_SEND_PLAYER_ACTION, Receivers.AllBuffered, action, money);
+        }
+
         public override void RecieveCard(RpcArgs args)
         {
             throw new NotImplementedException();
@@ -53,6 +57,7 @@ namespace Poker.Game.Players
 
         public override void SendPlayerAction(RpcArgs args)
         {
+            // 
             throw new NotImplementedException();
         }
     }
