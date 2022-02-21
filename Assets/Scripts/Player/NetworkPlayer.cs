@@ -18,12 +18,7 @@ namespace Poker.Game.Players
         // Start is called before the first frame update
         void Start()
         {
-            if (networkObject.IsOwner)
-            {
-                playerActions.isPlayer = true;
-            }
-
-            playerActions.playerNetwork = networkObject;
+            playerActions = GetComponent<PlayerActions>();
 
             if (!networkObject.IsOwner)
             {
@@ -41,7 +36,8 @@ namespace Poker.Game.Players
             }
         }
 
-        public void LocalAction(int action, int money) {
+        public void LocalAction(int action, int money)
+        {
             networkObject.SendRpc(RPC_SEND_PLAYER_ACTION, Receivers.AllBuffered, action, money);
         }
 
@@ -57,8 +53,25 @@ namespace Poker.Game.Players
 
         public override void SendPlayerAction(RpcArgs args)
         {
-            // 
-            throw new NotImplementedException();
+            // Run code for when the player recieves an action
+            if (!networkObject.IsOwner)
+            {
+                PlayerOption action = (PlayerOption)args.GetNext<int>();
+                switch (action)
+                {
+                    case PlayerOption.Bet:
+                        playerActions.Bet(args.GetNext<int>());
+                        break;
+                    case PlayerOption.Call:
+                        playerActions.Call();
+                        break;
+                    case PlayerOption.Fold:
+                        playerActions.Fold();
+                        break;
+                }
+                playerActions.player.money = networkObject.playerMoney;
+                playerActions.player.money = networkObject.playerIndex;
+            }
         }
     }
 }

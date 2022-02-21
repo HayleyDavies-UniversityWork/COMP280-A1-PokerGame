@@ -134,22 +134,6 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
---- !u!114 &2679795658564287502
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8085115859101348281}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f28d40811878561439db03914aa50da5, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  playerActions: {fileID: 0}
-  checkButton: {fileID: 7489487930551396611}
-  betButton: {fileID: 3575742875251808369}
-  buttonUI: []
 --- !u!1 &2679795658924043178
 GameObject:
   m_ObjectHideFlags: 0
@@ -691,7 +675,7 @@ GameObject:
   - component: {fileID: 2679795659103025953}
   m_Layer: 0
   m_Name: GameplayController
-  m_TagString: Untagged
+  m_TagString: GameController
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -2888,6 +2872,22 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+--- !u!114 &2679795658564287502
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8085115859101348281}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f28d40811878561439db03914aa50da5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  playerActions: {fileID: 0}
+  checkButton: {fileID: 7489487930551396611}
+  betButton: {fileID: 3575742875251808369}
+  buttonUI: []
 --- !u!1001 &2679795658421371308
 PrefabInstance:
   m_ObjectHideFlags: 0

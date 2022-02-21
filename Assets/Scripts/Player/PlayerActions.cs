@@ -21,7 +21,7 @@ namespace Poker.Game.Players
     public class PlayerActions : MonoBehaviour
     {
         public Player player;
-        public PlayerNetworkObject playerNetwork;
+        public NetworkPlayer networkObject;
 
         public UnityAction queuedAction;
         public bool isActionQueued = false;
@@ -45,6 +45,7 @@ namespace Poker.Game.Players
 
         private void Start()
         {
+            networkObject = GetComponent<NetworkPlayer>();
             if (isPlayer)
             {
                 playerUI = GetComponentInChildren<PlayerUI>();
@@ -91,7 +92,10 @@ namespace Poker.Game.Players
         public void Call()
         {
             option = PlayerOption.Call;
-            player.TakeMoney(gameController.currentBet - spendThisRound);
+            int amount = gameController.currentBet - spendThisRound;
+            player.TakeMoney(amount);
+
+            networkObject.LocalAction((int)option, amount);
 
             StartCoroutine(EndTurn());
         }
@@ -99,11 +103,18 @@ namespace Poker.Game.Players
         public void Bet()
         {
             int amount = Convert.ToInt32(betAmount.text) - spendThisRound;
+            Bet(amount);
+        }
+
+        public void Bet(int amount)
+        {
             if (amount > gameController.currentBet && amount <= player.money)
             {
                 option = PlayerOption.Bet;
                 player.TakeMoney(amount);
                 gameController.currentBet = amount;
+
+                networkObject.LocalAction((int)option, amount);
 
                 StartCoroutine(EndTurn());
             }
@@ -152,6 +163,8 @@ namespace Poker.Game.Players
             {
                 isOut = true;
             }
+
+            networkObject.LocalAction((int)option, 0);
 
             StartCoroutine(EndTurn());
         }

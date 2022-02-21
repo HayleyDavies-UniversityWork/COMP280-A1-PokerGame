@@ -4,11 +4,12 @@ using UnityEngine;
 
 namespace BeardedManStudios.Forge.Networking.Generated
 {
-	[GeneratedRPC("{\"types\":[[\"int\"]]")]
-	[GeneratedRPCVariableNames("{\"types\":[[\"seed\"]]")]
+	[GeneratedRPC("{\"types\":[[\"int\"][\"int\", \"bool\", \"bool\"]]")]
+	[GeneratedRPCVariableNames("{\"types\":[[\"seed\"][\"playerIndex\", \"isAI\", \"isHost\"]]")]
 	public abstract partial class GameplayControllerBehavior : NetworkBehavior
 	{
 		public const byte RPC_SET_DECK_SEED = 0 + 5;
+		public const byte RPC_ADD_PLAYER = 1 + 5;
 		
 		public GameplayControllerNetworkObject networkObject = null;
 
@@ -23,6 +24,7 @@ namespace BeardedManStudios.Forge.Networking.Generated
 
 			base.SetupHelperRpcs(networkObject);
 			networkObject.RegisterRpc("SetDeckSeed", SetDeckSeed, typeof(int));
+			networkObject.RegisterRpc("AddPlayer", AddPlayer, typeof(int), typeof(bool), typeof(bool));
 
 			networkObject.onDestroy += DestroyGameObject;
 
@@ -104,6 +106,13 @@ namespace BeardedManStudios.Forge.Networking.Generated
 		/// int seed
 		/// </summary>
 		public abstract void SetDeckSeed(RpcArgs args);
+		/// <summary>
+		/// Arguments:
+		/// int playerIndex
+		/// bool isAI
+		/// bool isHost
+		/// </summary>
+		public abstract void AddPlayer(RpcArgs args);
 
 		// DO NOT TOUCH, THIS GETS GENERATED PLEASE EXTEND THIS CLASS IF YOU WISH TO HAVE CUSTOM CODE ADDITIONS
 	}

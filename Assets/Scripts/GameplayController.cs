@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using BeardedManStudios.Forge.Networking.Generated;
+using BeardedManStudios.Forge.Networking.Unity;
 
 namespace Poker.Game
 {
@@ -23,6 +24,8 @@ namespace Poker.Game
 
     public class GameplayController : GameplayControllerBehavior
     {
+        public static GameplayController singleton;
+
         [Header("Table Settings")]
         public int currentBet;
         public Table pokerTable;
@@ -41,7 +44,7 @@ namespace Poker.Game
         public int currentPlayerIndex;
         int dealerID = 0;
         // players to track directly internally
-        Player host, lastPlayer;
+        Player host, lastPlayer, thisPlayer;
         public Queue<Player> playerQueue;
         public List<Player> foldedPlayers = new List<Player>();
 
@@ -52,20 +55,33 @@ namespace Poker.Game
         // Start is called before the first frame update
         void Start()
         {
+            Debugger.SetDebugMode(debugMode);
+            gameSettings = new GameSettings(1000, 50);
+            if (singleton == null)
+            {
+                singleton = this;
+            }
+            else
+            {
+                gameObject.SetActive(false);
+                return;
+            }
+
             if (networkObject == null)
             {
                 return;
             }
-            Initialize();
+
+            if (networkObject.IsServer)
+            {
+                Initialize();
+            }
             startGameButton.interactable = false;
         }
 
         void Initialize()
         {
-            gameSettings = new GameSettings(1000, 50);
-            Debugger.SetDebugMode(debugMode);
-            host = new Player(0, gameSettings.buyIn, this);
-            pokerTable = new Table(host);
+            thisPlayer = AddPlayer(false);
             pokerTable.Setup(networkObject.deckSeed);
             tableDisplay.pokerTable = pokerTable;
             foreach (Button b in addAIButtons)
@@ -74,13 +90,68 @@ namespace Poker.Game
             }
         }
 
-        public void AddAI(int index)
+        public Player AddPlayer(bool isAI)
         {
-            pokerTable.AddPlayer(new Player(index, gameSettings.buyIn, this), true);
+            int index = networkObject.totalPlayers;
+            return AddPlayer(isAI, index, false);
+        }
+
+        public Player AddPlayer(bool isAI, int index, bool fromNetwork)
+        {
+            Player player = new Player(index, gameSettings.buyIn, this);
+            bool isHost = networkObject.IsServer && pokerTable == null;
+
+            if (isHost)
+            {
+                pokerTable = new Table(player);
+            }
+            else
+            {
+                pokerTable.AddPlayer(player, isAI);
+            }
+            networkObject.totalPlayers++;
+
+            Debug.Log($"{pokerTable.playerList}");
+
             if (pokerTable.playerList.Count >= 2)
             {
                 startGameButton.interactable = true;
             }
+
+            if (!fromNetwork)
+            {
+                networkObject.SendRpc(RPC_ADD_PLAYER, Receivers.OthersBuffered, index, isAI, isHost);
+            }
+
+            return player;
+        }
+
+        public override void AddPlayer(RpcArgs args)
+        {
+            int index = args.GetNext<int>();
+            bool isAI = args.GetNext<bool>();
+            bool isHost = args.GetNext<bool>();
+
+            while (gameSettings == null)
+            {
+                // WAIT UNTIL ITS SET
+            }
+
+            if (isHost)
+            {
+                host = new Player(index, gameSettings.buyIn, this);
+                pokerTable = new Table(host);
+                Initialize();
+            }
+            else
+            {
+                AddPlayer(isAI, index, true);
+            }
+        }
+
+        public void AddAI()
+        {
+            AddPlayer(true);
         }
 
         public void StartGame()
