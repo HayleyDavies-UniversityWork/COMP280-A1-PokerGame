@@ -15,10 +15,9 @@ namespace Poker.Game
         public Dictionary<Player, int> totalInPots;
         public int currentPot;
 
-        public Table(Player host)
+        public Table()
         {
             playerList = new List<Player>();
-            this.AddPlayer(host);
         }
     }
 }

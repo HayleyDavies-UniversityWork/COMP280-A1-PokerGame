@@ -20,7 +20,7 @@ namespace Poker.Game.Players
 
         public void EnableUI()
         {
-            if (!playerActions.isPlayer) return;
+            if (playerActions.playerType != PlayerType.Player) return;
 
             int currentBet = playerActions.gameController.currentBet;
             int spendThisRound = playerActions.spendThisRound;
@@ -43,7 +43,7 @@ namespace Poker.Game.Players
 
         public void DisableUI()
         {
-            if (!playerActions.isPlayer) return;
+            if (playerActions.playerType != PlayerType.Player) return;
 
             if (playerActions.isOut)
             {

@@ -6,6 +6,7 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
 using TMPro;
+using BeardedManStudios.Forge.Networking.Unity;
 using BeardedManStudios.Forge.Networking.Generated;
 
 namespace Poker.Game.Players
@@ -21,12 +22,12 @@ namespace Poker.Game.Players
     public class PlayerActions : MonoBehaviour
     {
         public Player player;
-        public NetworkPlayer networkObject;
+        public NetworkPlayer networkPlayer;
 
         public UnityAction queuedAction;
         public bool isActionQueued = false;
         public bool isTurn;
-        public bool isPlayer;
+        public PlayerType playerType;
         public bool isOut;
         public int moneyInPot;
         public int spendThisRound;
@@ -45,45 +46,81 @@ namespace Poker.Game.Players
 
         private void Start()
         {
-            networkObject = GetComponent<NetworkPlayer>();
-            if (isPlayer)
+            if (playerType == PlayerType.Player)
             {
                 playerUI = GetComponentInChildren<PlayerUI>();
                 playerUI.playerActions = this;
             }
+
+            gameController = GameplayController.singleton;
+        }
+
+        private void CreateOnlinePlayerInstance()
+        {
+            if (networkPlayer != null)
+            {
+                return;
+            }
+
+            if (!gameController.networkObject.IsOwner)
+            {
+                networkPlayer = GetComponentInChildren<NetworkPlayer>();
+                return;
+            }
+
+            if (!gameController.networkObject.IsServer)
+            {
+                return;
+            }
+
+            GameObject networkPlayerObject = NetworkManager.Instance.InstantiatePlayer().gameObject;
+            networkPlayer = networkPlayerObject.GetComponent<NetworkPlayer>();
+            networkPlayer.playerActions = this;
+            networkPlayer.networkObject.playerIndex = player.number;
+            networkPlayer.networkObject.playerMoney = player.money;
         }
 
         public void PlayerTurn(GameplayController controller, Player currentPlayer)
         {
-            gameController = controller;
             isTurn = true;
             player = currentPlayer;
+            CreateOnlinePlayerInstance();
 
-            if (isPlayer)
+            switch (playerType)
             {
-                playerUI.EnableUI();
-                timer = StartCoroutine(PlayerTimeout(30));
-                if (isActionQueued)
-                {
-                    queuedAction.Invoke();
-                }
-            }
-            else
-            {
-                Call();
+                case PlayerType.AI:
+                    Call();
+                    break;
+                case PlayerType.Player:
+                    playerUI.EnableUI();
+                    timer = StartCoroutine(PlayerTimeout(30));
+                    if (isActionQueued)
+                    {
+                        queuedAction.Invoke();
+                    }
+                    break;
+                case PlayerType.Network:
+                    break;
             }
         }
 
         IEnumerator EndTurn()
         {
-            if (isPlayer)
+            switch (playerType)
             {
-                playerUI.DisableUI();
-                if (timer != null)
-                {
-                    StopCoroutine(timer);
-                }
+                case PlayerType.AI:
+                    break;
+                case PlayerType.Player:
+                    playerUI.DisableUI();
+                    if (timer != null)
+                    {
+                        StopCoroutine(timer);
+                    }
+                    break;
+                case PlayerType.Network:
+                    break;
             }
+
             yield return new WaitForSeconds(0.1f);
             isTurn = false;
             gameController.EndPlayerTurn(player);
@@ -95,7 +132,7 @@ namespace Poker.Game.Players
             int amount = gameController.currentBet - spendThisRound;
             player.TakeMoney(amount);
 
-            networkObject.LocalAction((int)option, amount);
+            networkPlayer.LocalAction((int)option, amount);
 
             StartCoroutine(EndTurn());
         }
@@ -114,7 +151,7 @@ namespace Poker.Game.Players
                 player.TakeMoney(amount);
                 gameController.currentBet = amount;
 
-                networkObject.LocalAction((int)option, amount);
+                networkPlayer.LocalAction((int)option, amount);
 
                 StartCoroutine(EndTurn());
             }
@@ -164,7 +201,7 @@ namespace Poker.Game.Players
                 isOut = true;
             }
 
-            networkObject.LocalAction((int)option, 0);
+            networkPlayer.LocalAction((int)option, 0);
 
             StartCoroutine(EndTurn());
         }

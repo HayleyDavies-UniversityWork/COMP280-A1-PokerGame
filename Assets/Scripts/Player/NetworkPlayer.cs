@@ -18,13 +18,11 @@ namespace Poker.Game.Players
         // Start is called before the first frame update
         void Start()
         {
-            playerActions = GetComponent<PlayerActions>();
+            GameObject player = GameObject.Find($"Player {networkObject.playerIndex + 1}");
 
-            if (!networkObject.IsOwner)
-            {
-                playerActions.player.money = networkObject.playerMoney;
-                playerActions.player.money = networkObject.playerIndex;
-            }
+            transform.parent = player.transform;
+
+            playerActions = player.GetComponent<PlayerActions>();
         }
 
         // Update is called once per frame
@@ -38,7 +36,7 @@ namespace Poker.Game.Players
 
         public void LocalAction(int action, int money)
         {
-            networkObject.SendRpc(RPC_SEND_PLAYER_ACTION, Receivers.AllBuffered, action, money);
+            networkObject.SendRpc(RPC_SEND_PLAYER_ACTION, Receivers.OthersBuffered, action, money);
         }
 
         public override void RecieveCard(RpcArgs args)
@@ -70,7 +68,7 @@ namespace Poker.Game.Players
                         break;
                 }
                 playerActions.player.money = networkObject.playerMoney;
-                playerActions.player.money = networkObject.playerIndex;
+                playerActions.player.number = networkObject.playerIndex;
             }
         }
     }

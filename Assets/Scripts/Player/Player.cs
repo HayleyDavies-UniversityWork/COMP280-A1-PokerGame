@@ -5,6 +5,14 @@ using UnityEngine;
 namespace Poker.Game.Players
 {
     using Display;
+
+    public enum PlayerType
+    {
+        AI,
+        Player,
+        Network
+    }
+
     public class Player
     {
         public Card[] hand;

@@ -32,10 +32,23 @@ namespace Poker.Game
         /// <param name="table">the table to add the player to</param>
         /// <param name="player">the player to be added</param>
         /// <param name="isAI">whether the player is or isn't an AI</param>
-        public static void AddPlayer(this Table table, Player player, bool isAI)
+        public static void AddPlayer(this Table table, Player player, PlayerType playerType)
         {
-            table.playerList.Add(player);
+
+            if (table.playerList.Count <= player.number)
+            {
+                for (int i = 0; i < player.number - table.playerList.Count; i++)
+                {
+                    table.playerList.Add(null);
+                }
+                table.playerList.Add(player);
+            }
+            else
+            {
+                table.playerList[player.number] = player;
+            }
             player.table = table;
+            player.actions.playerType = playerType;
             Debugger.Log($"Player {player.number} added to table.");
         }
 
@@ -46,7 +59,7 @@ namespace Poker.Game
         /// <param name="player">the player to be added</param>
         public static void AddPlayer(this Table table, Player player)
         {
-            table.AddPlayer(player, false);
+            table.AddPlayer(player, PlayerType.Player);
             player.table = table;
         }
 
