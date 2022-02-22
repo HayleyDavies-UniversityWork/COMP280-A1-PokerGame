@@ -52,6 +52,7 @@ namespace Poker.Game
         Player host, lastPlayer, thisPlayer;
         public Queue<Player> playerQueue;
         public List<Player> foldedPlayers = new List<Player>();
+        public List<Player> playerList;
 
         [Header("Other Table Options")]
         public DebugMode debugMode;
@@ -62,16 +63,7 @@ namespace Poker.Game
         {
             Debugger.SetDebugMode(debugMode);
             gameSettings = new GameSettings(1000, 50);
-
-            if (singleton == null)
-            {
-                singleton = this;
-            }
-            else
-            {
-                gameObject.SetActive(false);
-                return;
-            }
+            singleton = this;
 
             if (networkObject == null)
             {
@@ -86,7 +78,7 @@ namespace Poker.Game
         void Initialize()
         {
             pokerTable = new Table();
-            thisPlayer = AddPlayer(false);
+            thisPlayer = AddPlayer(PlayerType.Player);
             pokerTable.Setup(networkObject.deckSeed);
             tableDisplay.pokerTable = pokerTable;
 
@@ -100,22 +92,13 @@ namespace Poker.Game
             }
         }
 
-        void InitalizeClient()
-        {
-            thisPlayer = AddPlayer(false);
-            foreach (Button b in addAIButtons)
-            {
-                b.interactable = false;
-            }
-        }
-
-        public Player AddPlayer(bool isAI)
+        public Player AddPlayer(PlayerType playerType)
         {
             int index = networkObject.totalPlayers;
-            return AddPlayer(isAI, index, PlayerType.AI);
+            return AddPlayer(index, playerType);
         }
 
-        public Player AddPlayer(bool isAI, int index, PlayerType playerType)
+        public Player AddPlayer(int index, PlayerType playerType)
         {
             Player player = new Player(index, gameSettings.buyIn, this);
             bool isHost = networkObject.IsServer && pokerTable == null;
@@ -124,7 +107,7 @@ namespace Poker.Game
 
             networkObject.totalPlayers++;
 
-            Debug.Log($"{pokerTable.playerList}");
+            Debug.Log($"{pokerTable.playerList.Count}");
 
             if (pokerTable.playerList.Count >= 2 &&
             NetworkManager.Instance.IsServer)
@@ -134,7 +117,7 @@ namespace Poker.Game
 
             if (playerType != PlayerType.Network)
             {
-                networkObject.SendRpc(RPC_ADD_PLAYER, Receivers.OthersBuffered, index, isAI, isHost);
+                networkObject.SendRpc(RPC_ADD_PLAYER, Receivers.OthersBuffered, index, (int)playerType, isHost);
             }
 
             return player;
@@ -143,7 +126,7 @@ namespace Poker.Game
         public override void AddPlayer(RpcArgs args)
         {
             int index = args.GetNext<int>();
-            bool isAI = args.GetNext<bool>();
+            PlayerType playerType = (PlayerType)args.GetNext<int>();
             bool isHost = args.GetNext<bool>();
 
             while (gameSettings == null)
@@ -157,13 +140,12 @@ namespace Poker.Game
             }
             else
             {
-                AddPlayer(isAI, index, PlayerType.Network);
+                AddPlayer(index, PlayerType.Network);
             }
         }
         public override void StartGame(RpcArgs args)
         {
             singleton = this;
-            Debug.Log("ENABLING THE CANVASES");
             mainMenuCanvas.enabled = false;
             tableCanvas.enabled = true;
             nextStage = PokerStage.PreFlop;
@@ -172,7 +154,7 @@ namespace Poker.Game
 
         public void AddAI()
         {
-            AddPlayer(true);
+            AddPlayer(PlayerType.AI);
         }
 
         public void StartGame()
@@ -190,7 +172,7 @@ namespace Poker.Game
             IncrementCurrentPlayer();
             Player currentPlayer = pokerTable.playerList[currentPlayerIndex];
             Debugger.Log($"Player {currentPlayerIndex} turn");
-            currentPlayer.actions.PlayerTurn(this);
+            currentPlayer.actions.PlayerTurn(this, currentPlayer);
         }
 
         public void EndPlayerTurn(Player currentPlayer)
@@ -439,6 +421,8 @@ namespace Poker.Game
             {
                 Debugger.SetDebugMode(debugMode);
             }
+
+            playerList = new List<Player>(pokerTable.playerList);
         }
     }
 }

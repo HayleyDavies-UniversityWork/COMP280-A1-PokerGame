@@ -48,7 +48,7 @@ namespace Poker.Game
                 table.playerList[player.number] = player;
             }
             player.table = table;
-            player.actions.playerType = playerType;
+            player.actions.Initalize(player, playerType);
             Debugger.Log($"Player {player.number} added to table.");
         }
 

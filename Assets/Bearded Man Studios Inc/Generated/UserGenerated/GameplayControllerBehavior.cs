@@ -4,8 +4,8 @@ using UnityEngine;
 
 namespace BeardedManStudios.Forge.Networking.Generated
 {
-	[GeneratedRPC("{\"types\":[[\"int\"][\"int\", \"bool\", \"bool\"][]]")]
-	[GeneratedRPCVariableNames("{\"types\":[[\"seed\"][\"playerIndex\", \"isAI\", \"isHost\"][]]")]
+	[GeneratedRPC("{\"types\":[[\"int\"][\"int\", \"int\", \"bool\"][]]")]
+	[GeneratedRPCVariableNames("{\"types\":[[\"seed\"][\"playerIndex\", \"playerType\", \"isHost\"][]]")]
 	public abstract partial class GameplayControllerBehavior : NetworkBehavior
 	{
 		public const byte RPC_SET_DECK_SEED = 0 + 5;
@@ -25,7 +25,7 @@ namespace BeardedManStudios.Forge.Networking.Generated
 
 			base.SetupHelperRpcs(networkObject);
 			networkObject.RegisterRpc("SetDeckSeed", SetDeckSeed, typeof(int));
-			networkObject.RegisterRpc("AddPlayer", AddPlayer, typeof(int), typeof(bool), typeof(bool));
+			networkObject.RegisterRpc("AddPlayer", AddPlayer, typeof(int), typeof(int), typeof(bool));
 			networkObject.RegisterRpc("StartGame", StartGame);
 
 			networkObject.onDestroy += DestroyGameObject;
@@ -111,7 +111,7 @@ namespace BeardedManStudios.Forge.Networking.Generated
 		/// <summary>
 		/// Arguments:
 		/// int playerIndex
-		/// bool isAI
+		/// int playerType
 		/// bool isHost
 		/// </summary>
 		public abstract void AddPlayer(RpcArgs args);

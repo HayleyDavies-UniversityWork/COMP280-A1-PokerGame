@@ -46,13 +46,26 @@ namespace Poker.Game.Players
 
         private void Start()
         {
+
+        }
+
+        public void Initalize(Player playerReference, PlayerType typeOfPlayer)
+        {
+            gameController = GameplayController.singleton;
+            player = playerReference;
+            playerType = typeOfPlayer;
+
             if (playerType == PlayerType.Player)
             {
                 playerUI = GetComponentInChildren<PlayerUI>();
                 playerUI.playerActions = this;
             }
 
-            gameController = GameplayController.singleton;
+            CreateOnlinePlayerInstance();
+
+            NetworkPlayer[] networkPlayers = GameObject.FindObjectsOfType<NetworkPlayer>();
+
+            Debug.Log($"There are {networkPlayers.Length} network players in the scene.");
         }
 
         private void CreateOnlinePlayerInstance()
@@ -75,16 +88,13 @@ namespace Poker.Game.Players
 
             GameObject networkPlayerObject = NetworkManager.Instance.InstantiatePlayer().gameObject;
             networkPlayer = networkPlayerObject.GetComponent<NetworkPlayer>();
-            networkPlayer.playerActions = this;
-            networkPlayer.networkObject.playerIndex = player.number;
-            networkPlayer.networkObject.playerMoney = player.money;
+            networkPlayer.SetPlayerActions(this);
         }
 
         public void PlayerTurn(GameplayController controller, Player currentPlayer)
         {
             isTurn = true;
             player = currentPlayer;
-            CreateOnlinePlayerInstance();
 
             switch (playerType)
             {

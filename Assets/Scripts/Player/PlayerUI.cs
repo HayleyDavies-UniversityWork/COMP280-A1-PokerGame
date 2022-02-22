@@ -8,6 +8,7 @@ namespace Poker.Game.Players
 {
     public class PlayerUI : MonoBehaviour
     {
+        private Canvas display;
         public PlayerActions playerActions;
         public Button checkButton;
         public Button betButton;
@@ -15,12 +16,18 @@ namespace Poker.Game.Players
 
         void Start()
         {
+            display = GetComponent<Canvas>();
+
+            DisableCanvas();
+
             buttonUI = GetComponentsInChildren<Button>();
         }
 
         public void EnableUI()
         {
             if (playerActions.playerType != PlayerType.Player) return;
+
+            display.enabled = true;
 
             int currentBet = playerActions.gameController.currentBet;
             int spendThisRound = playerActions.spendThisRound;
@@ -54,6 +61,11 @@ namespace Poker.Game.Players
             }
         }
 
+        public void DisableCanvas()
+        {
+            display.enabled = false;
+        }
+
         void DisableButton(Button button)
         {
             button.interactable = false;
@@ -62,6 +74,31 @@ namespace Poker.Game.Players
         void EnableButton(Button button)
         {
             button.interactable = true;
+        }
+
+        public void Call()
+        {
+            playerActions.Call();
+        }
+
+        public void Bet()
+        {
+            playerActions.Bet();
+        }
+
+        public void CallAny()
+        {
+            playerActions.CallAny();
+        }
+
+        public void CheckFold()
+        {
+            playerActions.CheckFold();
+        }
+
+        public void Fold()
+        {
+            playerActions.Fold();
         }
     }
 }

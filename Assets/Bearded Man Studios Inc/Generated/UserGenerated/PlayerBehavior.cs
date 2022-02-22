@@ -4,13 +4,14 @@ using UnityEngine;
 
 namespace BeardedManStudios.Forge.Networking.Generated
 {
-	[GeneratedRPC("{\"types\":[[\"string\", \"string\"][][\"int\", \"int\"]]")]
-	[GeneratedRPCVariableNames("{\"types\":[[\"card1Value\", \"card2Value\"][][\"Action\", \"Money\"]]")]
+	[GeneratedRPC("{\"types\":[[\"string\", \"string\"][][\"int\", \"int\"][]]")]
+	[GeneratedRPCVariableNames("{\"types\":[[\"card1Value\", \"card2Value\"][][\"Action\", \"Money\"][]]")]
 	public abstract partial class PlayerBehavior : NetworkBehavior
 	{
 		public const byte RPC_RECIEVE_CARD = 0 + 5;
 		public const byte RPC_JOIN_TABLE = 1 + 5;
 		public const byte RPC_SEND_PLAYER_ACTION = 2 + 5;
+		public const byte RPC_RECIEVE_IN_SCENE = 3 + 5;
 		
 		public PlayerNetworkObject networkObject = null;
 
@@ -27,6 +28,7 @@ namespace BeardedManStudios.Forge.Networking.Generated
 			networkObject.RegisterRpc("RecieveCard", RecieveCard, typeof(string), typeof(string));
 			networkObject.RegisterRpc("JoinTable", JoinTable);
 			networkObject.RegisterRpc("SendPlayerAction", SendPlayerAction, typeof(int), typeof(int));
+			networkObject.RegisterRpc("RecieveInScene", RecieveInScene);
 
 			networkObject.onDestroy += DestroyGameObject;
 
@@ -117,6 +119,10 @@ namespace BeardedManStudios.Forge.Networking.Generated
 		/// Arguments:
 		/// </summary>
 		public abstract void SendPlayerAction(RpcArgs args);
+		/// <summary>
+		/// Arguments:
+		/// </summary>
+		public abstract void RecieveInScene(RpcArgs args);
 
 		// DO NOT TOUCH, THIS GETS GENERATED PLEASE EXTEND THIS CLASS IF YOU WISH TO HAVE CUSTOM CODE ADDITIONS
 	}

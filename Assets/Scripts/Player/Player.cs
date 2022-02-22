@@ -8,11 +8,13 @@ namespace Poker.Game.Players
 
     public enum PlayerType
     {
+        None,
         AI,
         Player,
         Network
     }
 
+    [System.Serializable]
     public class Player
     {
         public Card[] hand;

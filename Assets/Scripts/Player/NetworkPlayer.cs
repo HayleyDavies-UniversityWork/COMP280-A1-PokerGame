@@ -14,15 +14,13 @@ namespace Poker.Game.Players
     using Utils;
     public class NetworkPlayer : PlayerBehavior
     {
+        public Player player;
         public PlayerActions playerActions;
+        public int playerIndex;
         // Start is called before the first frame update
         void Start()
         {
-            GameObject player = GameObject.Find($"Player {networkObject.playerIndex + 1}");
 
-            transform.parent = player.transform;
-
-            playerActions = player.GetComponent<PlayerActions>();
         }
 
         // Update is called once per frame
@@ -30,7 +28,39 @@ namespace Poker.Game.Players
         {
             if (networkObject == null)
             {
+                Debug.LogWarning("I can't find my network object");
                 return;
+            }
+            playerIndex = networkObject.playerIndex;
+
+            if (transform.parent == null)
+            {
+                player = GameplayController.singleton.pokerTable.playerList[networkObject.playerIndex];
+
+                if (player == null)
+                {
+                    return;
+                }
+
+                playerActions = player.actions;
+                playerActions.networkPlayer = this;
+
+                transform.parent = playerActions.transform;
+            }
+        }
+
+        public void SetPlayerActions(PlayerActions actions)
+        {
+            playerActions = actions;
+            player = actions.player;
+
+            transform.parent = playerActions.transform;
+
+            if (networkObject.IsOwner)
+            {
+                networkObject.playerMoney = player.money;
+                networkObject.playerIndex = player.number;
+                networkObject.SendRpc(RPC_RECIEVE_IN_SCENE, Receivers.OthersBuffered);
             }
         }
 
@@ -70,6 +100,16 @@ namespace Poker.Game.Players
                 playerActions.player.money = networkObject.playerMoney;
                 playerActions.player.number = networkObject.playerIndex;
             }
+        }
+
+        public override void RecieveInScene(RpcArgs args)
+        {
+            player = GameplayController.singleton.pokerTable.playerList[networkObject.playerIndex];
+
+            playerActions = player.actions;
+            playerActions.networkPlayer = this;
+
+            transform.parent = playerActions.transform;
         }
     }
 }
