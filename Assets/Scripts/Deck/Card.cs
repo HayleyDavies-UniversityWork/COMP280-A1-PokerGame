@@ -69,6 +69,7 @@ namespace Poker.Game
         public string Suit;
         public SuitEnum SuitValue;
         public int Value;
+
         public Card(string number, string suit)
         {
             Number = number;
@@ -76,6 +77,7 @@ namespace Poker.Game
             SuitValue = suits[suit];
             Text = number + suit;
             Value = (int)numbers[number];
+
         }
     }
 

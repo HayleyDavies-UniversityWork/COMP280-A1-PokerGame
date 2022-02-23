@@ -31,7 +31,6 @@ namespace Poker.Game.Players
         {
             number = _number;
             money = _money;
-            hand = new Card[2];
 
             controller = _controller;
             display = controller.playerDisplays[number];
@@ -39,6 +38,11 @@ namespace Poker.Game.Players
             actions = controller.allPlayers[number];
 
             display.gameObject.SetActive(true);
+        }
+
+        public void ResetHand()
+        {
+            hand = new Card[2];
         }
     }
 }

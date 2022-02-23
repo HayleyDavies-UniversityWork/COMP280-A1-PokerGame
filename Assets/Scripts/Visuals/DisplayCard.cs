@@ -5,6 +5,7 @@ using TMPro;
 
 namespace Poker.Game.Display
 {
+    using Players;
     public class DisplayCard : MonoBehaviour
     {
         public GameObject cardFront;
@@ -12,10 +13,10 @@ namespace Poker.Game.Display
         public TextMeshProUGUI cardDetails;
         public float rotationSpeed = 1f;
         Card card;
-
+        public PlayerType playerType = PlayerType.None;
         bool displayFront = false;
-        public bool showToPlayer = false;
         private Quaternion startRotation;
+        public bool showToPlayer = false;
 
         // Start is called before the first frame update
         void Start()
@@ -54,8 +55,19 @@ namespace Poker.Game.Display
             }
         }
 
-        public void SetCard(Card _card)
+        public void SetCard(Card _card, PlayerType playerTypeReference)
         {
+            playerType = playerTypeReference;
+
+            if (playerType == PlayerType.Player || playerType == PlayerType.None)
+            {
+                showToPlayer = true;
+            }
+            else
+            {
+                showToPlayer = false;
+            }
+
             card = _card;
             cardDetails.text = _card.Text;
             cardDetails.color = Card.suitColor[_card.Suit];
@@ -65,6 +77,11 @@ namespace Poker.Game.Display
             {
                 StartCoroutine(FlipCard(180));
             }
+        }
+
+        public void SetCard(Card _card)
+        {
+            SetCard(_card, PlayerType.None);
         }
 
         public void Setup()

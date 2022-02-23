@@ -17,10 +17,13 @@ namespace Poker.Game.Players
         public Player player;
         public PlayerActions playerActions;
         public int playerIndex;
+        public bool IsOwner;
         // Start is called before the first frame update
         void Start()
         {
+            playerIndex = networkObject.playerIndex;
 
+            IsOwner = networkObject.IsOwner;
         }
 
         // Update is called once per frame
@@ -31,22 +34,6 @@ namespace Poker.Game.Players
                 Debug.LogWarning("I can't find my network object");
                 return;
             }
-            playerIndex = networkObject.playerIndex;
-
-            if (transform.parent == null)
-            {
-                player = GameplayController.singleton.pokerTable.playerList[networkObject.playerIndex];
-
-                if (player == null)
-                {
-                    return;
-                }
-
-                playerActions = player.actions;
-                playerActions.networkPlayer = this;
-
-                transform.parent = playerActions.transform;
-            }
         }
 
         public void SetPlayerActions(PlayerActions actions)
@@ -56,17 +43,38 @@ namespace Poker.Game.Players
 
             transform.parent = playerActions.transform;
 
-            if (networkObject.IsOwner)
+            networkObject.playerMoney = player.money;
+            networkObject.playerIndex = player.number;
+            networkObject.SendRpc(RPC_JOIN_TABLE, Receivers.OthersBuffered);
+        }
+
+        public void SetPlayerActions()
+        {
+            player = GameplayController.singleton.pokerTable.playerList[networkObject.playerIndex];
+
+            if (player == null)
             {
-                networkObject.playerMoney = player.money;
-                networkObject.playerIndex = player.number;
-                networkObject.SendRpc(RPC_RECIEVE_IN_SCENE, Receivers.OthersBuffered);
+                return;
             }
+
+            player.money = networkObject.playerMoney;
+            player.number = networkObject.playerIndex;
+
+            playerActions = player.actions;
+            playerActions.networkPlayer = this;
+
+            transform.parent = playerActions.transform;
         }
 
         public void LocalAction(int action, int money)
         {
+            if (!networkObject.IsOwner)
+            {
+                return;
+            }
+
             networkObject.SendRpc(RPC_SEND_PLAYER_ACTION, Receivers.OthersBuffered, action, money);
+            networkObject.playerMoney = playerActions.player.money;
         }
 
         public override void RecieveCard(RpcArgs args)
@@ -76,40 +84,47 @@ namespace Poker.Game.Players
 
         public override void JoinTable(RpcArgs args)
         {
-            throw new NotImplementedException();
+            SetPlayerActions();
         }
 
         public override void SendPlayerAction(RpcArgs args)
         {
-            // Run code for when the player recieves an action
-            if (!networkObject.IsOwner)
+            if (playerActions == null)
             {
-                PlayerOption action = (PlayerOption)args.GetNext<int>();
-                switch (action)
-                {
-                    case PlayerOption.Bet:
-                        playerActions.Bet(args.GetNext<int>());
-                        break;
-                    case PlayerOption.Call:
-                        playerActions.Call();
-                        break;
-                    case PlayerOption.Fold:
-                        playerActions.Fold();
-                        break;
-                }
-                playerActions.player.money = networkObject.playerMoney;
-                playerActions.player.number = networkObject.playerIndex;
+                SetPlayerActions();
             }
+
+            if (playerActions.playerType != PlayerType.Network)
+            {
+                return;
+            }
+
+            PlayerOption action = (PlayerOption)args.GetNext<int>();
+            Debug.LogError($"Player {networkObject.playerIndex} has taken turn of {action}");
+            switch (action)
+            {
+                case PlayerOption.Bet:
+                    playerActions.Bet(args.GetNext<int>());
+                    break;
+                case PlayerOption.Call:
+                    playerActions.Call();
+                    break;
+                case PlayerOption.Fold:
+                    playerActions.Fold();
+                    break;
+            }
+
+            SyncPlayer();
+        }
+
+        public void SyncPlayer()
+        {
+            playerActions.player.money = networkObject.playerMoney;
+            playerActions.player.number = networkObject.playerIndex;
         }
 
         public override void RecieveInScene(RpcArgs args)
         {
-            player = GameplayController.singleton.pokerTable.playerList[networkObject.playerIndex];
-
-            playerActions = player.actions;
-            playerActions.networkPlayer = this;
-
-            transform.parent = playerActions.transform;
         }
     }
 }

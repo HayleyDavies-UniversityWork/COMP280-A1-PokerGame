@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using BeardedManStudios.Forge.Networking.Unity;
 
 namespace Poker.Game
 {
@@ -176,6 +177,18 @@ namespace Poker.Game
         {
             table.cards = new Card[5];
             table.deck = new Deck(deckSeed);
+
+            table.pots = new List<int>() {
+                0
+            };
+
+            table.currentPot = 0;
+        }
+
+        public static void Setup(this Table table, string deckString)
+        {
+            table.cards = new Card[5];
+            table.deck = new Deck(deckString);
 
             table.pots = new List<int>() {
                 0

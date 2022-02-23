@@ -10,24 +10,34 @@ namespace Poker.Game.Players
     {
         private Canvas display;
         public PlayerActions playerActions;
-        public Button checkButton;
         public Button betButton;
+        public Button checkButton;
         public Button[] buttonUI;
 
         void Start()
         {
             display = GetComponent<Canvas>();
 
-            DisableCanvas();
-
             buttonUI = GetComponentsInChildren<Button>();
+        }
+
+        void Update()
+        {
+            if (playerActions?.playerType != PlayerType.Player)
+            {
+                display.enabled = false;
+            }
+
+            if (playerActions != null)
+            {
+                betButton.interactable = playerActions.isTurn;
+                checkButton.interactable = playerActions.isTurn;
+            }
         }
 
         public void EnableUI()
         {
             if (playerActions.playerType != PlayerType.Player) return;
-
-            display.enabled = true;
 
             int currentBet = playerActions.gameController.currentBet;
             int spendThisRound = playerActions.spendThisRound;
@@ -59,11 +69,6 @@ namespace Poker.Game.Players
                     DisableButton(b);
                 }
             }
-        }
-
-        public void DisableCanvas()
-        {
-            display.enabled = false;
         }
 
         void DisableButton(Button button)

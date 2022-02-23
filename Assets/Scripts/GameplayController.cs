@@ -57,6 +57,7 @@ namespace Poker.Game
         [Header("Other Table Options")]
         public DebugMode debugMode;
         PokerStage nextStage = PokerStage.PreFlop;
+        public int deckSeed;
 
         // Start is called before the first frame update
         void Start()
@@ -79,8 +80,16 @@ namespace Poker.Game
         {
             pokerTable = new Table();
             thisPlayer = AddPlayer(PlayerType.Player);
-            pokerTable.Setup(networkObject.deckSeed);
+
+            if (!networkObject.IsServer)
+            {
+                return;
+            }
+
             tableDisplay.pokerTable = pokerTable;
+            networkObject.deckSeed = UnityEngine.Random.Range(int.MinValue, int.MaxValue);
+            pokerTable.Setup(networkObject.deckSeed);
+            networkObject.SendRpc(RPC_GET_DECK_STRING, Receivers.OthersBuffered, pokerTable.deck.deckValue);
 
             // Server only functions
             if (NetworkManager.Instance.IsServer)
@@ -90,6 +99,14 @@ namespace Poker.Game
                     b.interactable = true;
                 }
             }
+        }
+
+        public override void GetDeckString(RpcArgs args)
+        {
+            string deckString = args.GetNext<string>();
+            pokerTable.Setup(deckString);
+
+            tableDisplay.pokerTable = pokerTable;
         }
 
         public Player AddPlayer(PlayerType playerType)
@@ -143,8 +160,13 @@ namespace Poker.Game
                 AddPlayer(index, PlayerType.Network);
             }
         }
-        public override void StartGame(RpcArgs args)
+
+        public void StartGame()
         {
+            if (networkObject.IsOwner)
+            {
+                networkObject.SendRpc(RPC_START_GAME, Receivers.OthersBuffered);
+            }
             singleton = this;
             mainMenuCanvas.enabled = false;
             tableCanvas.enabled = true;
@@ -152,14 +174,14 @@ namespace Poker.Game
             StartNextPhase();
         }
 
+        public override void StartGame(RpcArgs args)
+        {
+            StartGame();
+        }
+
         public void AddAI()
         {
             AddPlayer(PlayerType.AI);
-        }
-
-        public void StartGame()
-        {
-            networkObject.SendRpc(RPC_START_GAME, Receivers.AllBuffered);
         }
 
         public void LeaveGame()
@@ -175,10 +197,10 @@ namespace Poker.Game
             currentPlayer.actions.PlayerTurn(this, currentPlayer);
         }
 
-        public void EndPlayerTurn(Player currentPlayer)
+        public void EndPlayerTurn(Player currentPlayer, PlayerOption option)
         {
             PlayerActions player = currentPlayer.actions;
-            switch (player.option)
+            switch (option)
             {
                 case PlayerOption.Bet:
                     lastPlayer = GetFinalPlayer();
@@ -242,9 +264,17 @@ namespace Poker.Game
                     nextStage = PokerStage.Reset;
                     break;
                 case PokerStage.Reset:
-                    StartCoroutine(RestartGame());
+                    if (networkObject.IsOwner)
+                    {
+                        networkObject.SendRpc(RPC_RESTART_GAME, Receivers.AllBuffered);
+                    }
                     break;
             }
+        }
+
+        public override void RestartGame(RpcArgs args)
+        {
+            StartCoroutine(RestartGame());
         }
 
         IEnumerator RestartGame()
@@ -304,11 +334,17 @@ namespace Poker.Game
                 c.Setup();
             }
 
-            pokerTable.Setup(networkObject.deckSeed);
+            if (networkObject.IsServer)
+            {
+
+                networkObject.deckSeed = UnityEngine.Random.Range(int.MinValue, int.MaxValue);
+                pokerTable.Setup(networkObject.deckSeed);
+                networkObject.SendRpc(RPC_GET_DECK_STRING, Receivers.OthersBuffered, pokerTable.deck.deckValue);
+
+                StartGame();
+            }
 
             foldedPlayers = new List<Player>();
-
-            StartGame();
         }
 
         void StagePreFlop()
@@ -398,20 +434,26 @@ namespace Poker.Game
 
         void DealCards()
         {
+            foreach (Player p in pokerTable.playerList)
+            {
+                p.ResetHand();
+            }
+
             for (int i = 0; i < 2; i++)
             {
                 foreach (Player p in pokerTable.playerList)
                 {
                     Card card = pokerTable.deck.DealCard();
                     p.GiveCard(card);
-                    p.display.handCards[i].SetCard(card);
+                    p.display.handCards[i].SetCard(card, p.actions.playerType);
                 }
             }
         }
 
         public override void SetDeckSeed(RpcArgs args)
         {
-            throw new System.NotImplementedException();
+            networkObject.deckSeed = args.GetNext<int>();
+            deckSeed = networkObject.deckSeed;
         }
 
         // Update is called once per frame

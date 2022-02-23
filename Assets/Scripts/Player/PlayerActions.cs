@@ -14,6 +14,7 @@ namespace Poker.Game.Players
     using Utils;
     public enum PlayerOption
     {
+        None,
         Bet,
         Call,
         Fold
@@ -37,9 +38,6 @@ namespace Poker.Game.Players
         public PlayerOption option;
 
         public PlayerUI playerUI;
-
-        public Button betButton;
-        public Button checkButton;
         public TMP_InputField betAmount;
 
         Coroutine timer;
@@ -55,13 +53,15 @@ namespace Poker.Game.Players
             player = playerReference;
             playerType = typeOfPlayer;
 
-            if (playerType == PlayerType.Player)
-            {
-                playerUI = GetComponentInChildren<PlayerUI>();
-                playerUI.playerActions = this;
-            }
+            playerUI = GetComponentInChildren<PlayerUI>();
+            playerUI.playerActions = this;
+            betAmount = playerUI.GetComponentInChildren<TMP_InputField>();
 
-            CreateOnlinePlayerInstance();
+            if (playerType != PlayerType.Network)
+            {
+
+                CreateOnlinePlayerInstance();
+            }
 
             NetworkPlayer[] networkPlayers = GameObject.FindObjectsOfType<NetworkPlayer>();
 
@@ -70,18 +70,8 @@ namespace Poker.Game.Players
 
         private void CreateOnlinePlayerInstance()
         {
+            networkPlayer = GetComponentInChildren<NetworkPlayer>();
             if (networkPlayer != null)
-            {
-                return;
-            }
-
-            if (!gameController.networkObject.IsOwner)
-            {
-                networkPlayer = GetComponentInChildren<NetworkPlayer>();
-                return;
-            }
-
-            if (!gameController.networkObject.IsServer)
             {
                 return;
             }
@@ -108,13 +98,17 @@ namespace Poker.Game.Players
                     {
                         queuedAction.Invoke();
                     }
+                    if (player.money == 0)
+                    {
+                        Call();
+                    }
                     break;
                 case PlayerType.Network:
                     break;
             }
         }
 
-        IEnumerator EndTurn()
+        IEnumerator EndTurn(int amount)
         {
             switch (playerType)
             {
@@ -126,25 +120,29 @@ namespace Poker.Game.Players
                     {
                         StopCoroutine(timer);
                     }
+
+                    networkPlayer.LocalAction((int)option, amount);
                     break;
                 case PlayerType.Network:
                     break;
             }
 
-            yield return new WaitForSeconds(0.1f);
             isTurn = false;
-            gameController.EndPlayerTurn(player);
+            yield return new WaitForSeconds(0.1f);
+            gameController.EndPlayerTurn(player, option);
+            option = PlayerOption.None;
         }
 
         public void Call()
         {
-            option = PlayerOption.Call;
-            int amount = gameController.currentBet - spendThisRound;
-            player.TakeMoney(amount);
+            if (isTurn)
+            {
+                option = PlayerOption.Call;
+                int amount = gameController.currentBet - spendThisRound;
+                player.TakeMoney(amount);
 
-            networkPlayer.LocalAction((int)option, amount);
-
-            StartCoroutine(EndTurn());
+                StartCoroutine(EndTurn(amount));
+            }
         }
 
         public void Bet()
@@ -161,9 +159,7 @@ namespace Poker.Game.Players
                 player.TakeMoney(amount);
                 gameController.currentBet = amount;
 
-                networkPlayer.LocalAction((int)option, amount);
-
-                StartCoroutine(EndTurn());
+                StartCoroutine(EndTurn(amount));
             }
         }
 
@@ -211,9 +207,7 @@ namespace Poker.Game.Players
                 isOut = true;
             }
 
-            networkPlayer.LocalAction((int)option, 0);
-
-            StartCoroutine(EndTurn());
+            StartCoroutine(EndTurn(0));
         }
 
         void QueueAction(UnityAction actionToQueue)

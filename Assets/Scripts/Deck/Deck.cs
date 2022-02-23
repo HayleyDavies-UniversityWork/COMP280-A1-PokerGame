@@ -12,6 +12,12 @@ namespace Poker.Game
         // a list of all the possible card combinations
         List<Card> allCards;
 
+        Random prng;
+
+        public string deckValue;
+
+        private char separator = '-';
+
         /// <summary>
         /// a collection which stores cards
         /// </summary>
@@ -19,8 +25,43 @@ namespace Poker.Game
         {
             // get all the cards
             allCards = GetAllCards();
+
+            prng = new Random(seed);
             // and shuffle them
-            shuffledCards = Shuffle(this, seed);
+            shuffledCards = Shuffle(this);
+            deckValue = "";
+
+            int i = 0;
+            foreach (Card c in shuffledCards)
+            {
+                int index = allCards.IndexOf(c);
+                if (i != 0)
+                {
+                    deckValue += $"{separator}";
+                }
+                deckValue += $"{index}";
+                i++;
+            }
+        }
+
+        public Deck(string deckString)
+        {
+            allCards = GetAllCards();
+
+            shuffledCards = SyncDeck(deckString);
+        }
+
+        public Queue<Card> SyncDeck(string deckString)
+        {
+            Queue<Card> deck = new Queue<Card>();
+            string[] cardOrder = deckString.Split(separator);
+            foreach (string s in cardOrder)
+            {
+                int cardIndex = Int32.Parse(s);
+                deck.Enqueue(allCards[cardIndex]);
+            }
+
+            return deck;
         }
 
         /// <summary>
@@ -28,12 +69,11 @@ namespace Poker.Game
         /// </summary>
         /// <param name="deck">the deck to shuffle</param>
         /// <returns>a queue of the shuffled deck</returns>
-        public Queue<Card> Shuffle(Deck deck, int seed)
+        public Queue<Card> Shuffle(Deck deck)
         {
             Queue<Card> shuffle = new Queue<Card>();
 
             List<Card> cardsInDeck = new List<Card>(deck.allCards);
-            Random prng = new Random(seed);
 
             int cardsLength = deck.allCards.Count;
             // for all the values in the deck

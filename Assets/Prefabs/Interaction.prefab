@@ -726,8 +726,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   playerActions: {fileID: 0}
-  checkButton: {fileID: 3783952615900757319}
   betButton: {fileID: 7128312552173292597}
+  callButton: {fileID: 3783952615900757319}
+  checkButton: {fileID: 3783952615900757319}
   buttonUI: []
 --- !u!1 &3227553661332631545
 GameObject:

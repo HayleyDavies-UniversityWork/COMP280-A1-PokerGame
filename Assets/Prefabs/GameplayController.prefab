@@ -753,6 +753,7 @@ MonoBehaviour:
   foldedPlayers: []
   playerList: []
   debugMode: 0
+  deckSeed: 0
 --- !u!1 &2679795659191465035
 GameObject:
   m_ObjectHideFlags: 0
@@ -5092,12 +5093,12 @@ PrefabInstance:
     - target: {fileID: 6542004725711623208, guid: 56cba88bf5a7745d7b90834a26fa2283,
         type: 3}
       propertyPath: showToPlayer
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6542004726404387394, guid: 56cba88bf5a7745d7b90834a26fa2283,
         type: 3}
       propertyPath: showToPlayer
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6542004726974528796, guid: 56cba88bf5a7745d7b90834a26fa2283,
         type: 3}
