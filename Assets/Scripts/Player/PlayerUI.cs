@@ -6,6 +6,7 @@ using TMPro;
 
 namespace Poker.Game.Players
 {
+    using Utils;
     public class PlayerUI : MonoBehaviour
     {
         private Canvas display;
@@ -47,7 +48,7 @@ namespace Poker.Game.Players
             }
             else
             {
-                Debug.Log($"{currentBet} | {spendThisRound}");
+                Debugger.Log($"{currentBet} | {spendThisRound}");
                 checkButton.GetComponentInChildren<TextMeshProUGUI>().text = $"Call ${currentBet - spendThisRound}";
             }
             EnableButton(checkButton);

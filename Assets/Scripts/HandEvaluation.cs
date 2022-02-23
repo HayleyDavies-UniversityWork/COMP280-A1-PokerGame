@@ -69,7 +69,20 @@ namespace Poker.Game.Utils
 
         static List<Card> SortCardsByValue(List<Card> cards)
         {
+
             List<Card> sortedCards = new List<Card>();
+
+            int totalValidCards = cards.Count;
+            for (int i = 0; i < cards.Count; i++)
+            {
+                if (cards[i] == null)
+                {
+                    totalValidCards = i;
+                    break;
+                }
+            }
+
+            cards.RemoveRange(totalValidCards, cards.Count - totalValidCards);
 
             foreach (Card c in cards.OrderBy(c => c.Value))
             {
@@ -118,37 +131,45 @@ namespace Poker.Game.Utils
             bool hasFullHouse = false;
             bool hasTwoPair = false;
 
-            foreach (KeyValuePair<int, int> i in cardCounts)
+            foreach (KeyValuePair<int, int> card in cardCounts)
             {
-                if (((highestCount == 2 && i.Value == 3)
-              || (highestCount == 3 && i.Value == 2)) && !hasFullHouse)
+                if (((highestCount == 2 && card.Value == 3)
+              || (highestCount == 3 && card.Value == 2)) && !hasFullHouse)
                 {
-                    handStrength += i.Key * i.Value;
+                    handStrength += card.Key * card.Value;
                     hasFullHouse = true;
                     break;
                 }
-                else if (i.Value > highestCount)
+                else if (card.Value > highestCount)
                 {
-                    highestCount = i.Value;
-                    handStrength = i.Key * i.Value;
+                    highestCount = card.Value;
+                    handStrength = card.Key * card.Value;
                     highCardValues = cardValues;
-                    for (int j = 0; j < i.Value; j++)
+                    if (highCardValues.Count >= 5)
                     {
-                        highCardValues.Remove(i.Key);
+                        for (int j = 0; j < card.Value; j++)
+                        {
+                            highCardValues.Remove(card.Key);
+                        }
                     }
                 }
-                else if (highestCount == 2 && i.Value == 2 && !hasTwoPair)
+                else if (highestCount == 2 && card.Value == 2 && !hasTwoPair)
                 {
-                    handStrength += i.Key * i.Value;
+                    handStrength += card.Key * card.Value;
                     hasTwoPair = true;
-                    for (int j = 0; j < i.Value; j++)
+                    for (int j = 0; j < card.Value; j++)
                     {
-                        highCardValues.Remove(i.Key);
+                        highCardValues.Remove(card.Key);
                     }
                 }
             }
 
             int highCardCount = 5 - highestCount;
+
+            if (highCardCount > cards.Count)
+            {
+                highCardCount = cards.Count;
+            }
 
             if (highestCount == 4)
             {

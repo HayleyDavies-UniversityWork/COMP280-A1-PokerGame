@@ -15,7 +15,6 @@ namespace Poker.Game.Players
         /// <param name="card">the card to add</param>
         public static void GiveCard(this Player player, Card card)
         {
-            Debugger.Warn($"Adding Card to Player Hand");
             for (int i = 0; i < player.hand.Length; i++)
             {
                 if (player.hand[i] == null)

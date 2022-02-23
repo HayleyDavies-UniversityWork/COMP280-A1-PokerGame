@@ -100,7 +100,6 @@ namespace Poker.Game.Players
             }
 
             PlayerOption action = (PlayerOption)args.GetNext<int>();
-            Debug.LogError($"Player {networkObject.playerIndex} has taken turn of {action}");
             switch (action)
             {
                 case PlayerOption.Bet:

@@ -12,6 +12,7 @@ using BeardedManStudios.Forge.Networking.Generated;
 namespace Poker.Game.Players
 {
     using Utils;
+    using AI;
     public enum PlayerOption
     {
         None,
@@ -40,11 +41,12 @@ namespace Poker.Game.Players
         public PlayerUI playerUI;
         public TMP_InputField betAmount;
 
+        public PlayerAI playerAI;
+
         Coroutine timer;
 
         private void Start()
         {
-
         }
 
         public void Initalize(Player playerReference, PlayerType typeOfPlayer)
@@ -59,13 +61,18 @@ namespace Poker.Game.Players
 
             if (playerType != PlayerType.Network)
             {
-
                 CreateOnlinePlayerInstance();
             }
 
             NetworkPlayer[] networkPlayers = GameObject.FindObjectsOfType<NetworkPlayer>();
 
-            Debug.Log($"There are {networkPlayers.Length} network players in the scene.");
+            Debugger.Log($"There are {networkPlayers.Length} network players in the scene.");
+
+            if (playerType == PlayerType.AI)
+            {
+                playerAI = gameObject.AddComponent<PlayerAI>();
+                playerAI.playerActions = this;
+            }
         }
 
         private void CreateOnlinePlayerInstance()
@@ -89,7 +96,14 @@ namespace Poker.Game.Players
             switch (playerType)
             {
                 case PlayerType.AI:
-                    Call();
+                    if (player.money == 0)
+                    {
+                        Call();
+                    }
+                    else
+                    {
+                        HandlePlayerAI();
+                    }
                     break;
                 case PlayerType.Player:
                     playerUI.EnableUI();
@@ -104,6 +118,29 @@ namespace Poker.Game.Players
                     }
                     break;
                 case PlayerType.Network:
+                    break;
+            }
+        }
+
+        void HandlePlayerAI()
+        {
+            Table pokerTable = gameController.pokerTable;
+            int currentBet = gameController.currentBet - spendThisRound;
+
+            AIAction action = playerAI.CalculatePlay(player.hand, pokerTable.cards, currentBet, (int)gameController.nextStage);
+
+            Debugger.Log($"Player {player.number} has chosen to {action.option} spending {action.money}");
+
+            switch (action.option)
+            {
+                case PlayerOption.Bet:
+                    Bet(action.money);
+                    break;
+                case PlayerOption.Call:
+                    Call();
+                    break;
+                case PlayerOption.Fold:
+                    Fold();
                     break;
             }
         }

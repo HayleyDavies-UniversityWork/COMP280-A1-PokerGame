@@ -13,7 +13,7 @@ namespace Poker.Game
     using Players;
     using BeardedManStudios.Forge.Networking;
 
-    enum PokerStage
+    public enum PokerStage
     {
         PreFlop,
         Flop,
@@ -51,12 +51,12 @@ namespace Poker.Game
         // players to track directly internally
         Player host, lastPlayer, thisPlayer;
         public Queue<Player> playerQueue;
-        public List<Player> foldedPlayers = new List<Player>();
+        public Player[] foldedPlayers;
         public List<Player> playerList;
 
         [Header("Other Table Options")]
         public DebugMode debugMode;
-        PokerStage nextStage = PokerStage.PreFlop;
+        public PokerStage nextStage = PokerStage.PreFlop;
         public int deckSeed;
 
         // Start is called before the first frame update
@@ -124,8 +124,6 @@ namespace Poker.Game
 
             networkObject.totalPlayers++;
 
-            Debug.Log($"{pokerTable.playerList.Count}");
-
             if (pokerTable.playerList.Count >= 2 &&
             NetworkManager.Instance.IsServer)
             {
@@ -167,6 +165,7 @@ namespace Poker.Game
             {
                 networkObject.SendRpc(RPC_START_GAME, Receivers.OthersBuffered);
             }
+            foldedPlayers = new Player[pokerTable.playerList.Count];
             singleton = this;
             mainMenuCanvas.enabled = false;
             tableCanvas.enabled = true;
@@ -193,7 +192,7 @@ namespace Poker.Game
         {
             IncrementCurrentPlayer();
             Player currentPlayer = pokerTable.playerList[currentPlayerIndex];
-            Debugger.Log($"Player {currentPlayerIndex} turn");
+            Debugger.Log($"Player {currentPlayer.number} turn");
             currentPlayer.actions.PlayerTurn(this, currentPlayer);
         }
 
@@ -208,7 +207,7 @@ namespace Poker.Game
                 case PlayerOption.Call:
                     break;
                 case PlayerOption.Fold:
-                    foldedPlayers.Add(currentPlayer);
+                    foldedPlayers[currentPlayer.number] = currentPlayer;
                     RemovePlayer(currentPlayer);
                     lastPlayer = GetNextPlayer();
                     break;
@@ -241,7 +240,6 @@ namespace Poker.Game
 
             foreach (Player p in pokerTable.playerList)
             {
-                Debug.Log(pokerTable.playerList.Count);
                 p.actions.spendThisRound = 0;
             }
 
@@ -301,7 +299,10 @@ namespace Poker.Game
 
             foreach (Player p in foldedPlayers)
             {
-                pokerTable.playerList.Insert(p.number, p);
+                if (p != null)
+                {
+                    pokerTable.playerList.Insert(p.number, p);
+                }
             }
 
             foreach (Player p in pokerTable.playerList)
@@ -343,8 +344,6 @@ namespace Poker.Game
 
                 StartGame();
             }
-
-            foldedPlayers = new List<Player>();
         }
 
         void StagePreFlop()

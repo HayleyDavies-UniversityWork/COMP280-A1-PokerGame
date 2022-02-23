@@ -753,6 +753,7 @@ MonoBehaviour:
   foldedPlayers: []
   playerList: []
   debugMode: 0
+  nextStage: 0
   deckSeed: 0
 --- !u!1 &2679795659191465035
 GameObject:
