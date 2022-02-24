@@ -26,7 +26,7 @@ namespace Poker.Game.Display
             }
         }
 
-        public void DisplayWinner()
+        public void ClearWinner()
         {
             DisplayWinner("");
         }

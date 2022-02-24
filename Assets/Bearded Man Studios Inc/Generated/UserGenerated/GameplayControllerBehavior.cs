@@ -4,15 +4,14 @@ using UnityEngine;
 
 namespace BeardedManStudios.Forge.Networking.Generated
 {
-	[GeneratedRPC("{\"types\":[[\"int\"][\"int\", \"int\", \"bool\"][][][\"string\"]]")]
-	[GeneratedRPCVariableNames("{\"types\":[[\"seed\"][\"playerIndex\", \"playerType\", \"isHost\"][][][\"deckString\"]]")]
+	[GeneratedRPC("{\"types\":[[\"int\", \"bool\"][][][\"string\"]]")]
+	[GeneratedRPCVariableNames("{\"types\":[[\"playerIndex\", \"isHost\"][][][\"deckString\"]]")]
 	public abstract partial class GameplayControllerBehavior : NetworkBehavior
 	{
-		public const byte RPC_SET_DECK_SEED = 0 + 5;
-		public const byte RPC_ADD_PLAYER = 1 + 5;
-		public const byte RPC_START_GAME = 2 + 5;
-		public const byte RPC_RESTART_GAME = 3 + 5;
-		public const byte RPC_GET_DECK_STRING = 4 + 5;
+		public const byte RPC_ADD_NETWORK_PLAYER = 0 + 5;
+		public const byte RPC_START_GAME = 1 + 5;
+		public const byte RPC_RESTART_GAME = 2 + 5;
+		public const byte RPC_UPDATE_DECK_STRING = 3 + 5;
 		
 		public GameplayControllerNetworkObject networkObject = null;
 
@@ -26,11 +25,10 @@ namespace BeardedManStudios.Forge.Networking.Generated
 			networkObject.AttachedBehavior = this;
 
 			base.SetupHelperRpcs(networkObject);
-			networkObject.RegisterRpc("SetDeckSeed", SetDeckSeed, typeof(int));
-			networkObject.RegisterRpc("AddPlayer", AddPlayer, typeof(int), typeof(int), typeof(bool));
+			networkObject.RegisterRpc("AddNetworkPlayer", AddNetworkPlayer, typeof(int), typeof(bool));
 			networkObject.RegisterRpc("StartGame", StartGame);
 			networkObject.RegisterRpc("RestartGame", RestartGame);
-			networkObject.RegisterRpc("GetDeckString", GetDeckString, typeof(string));
+			networkObject.RegisterRpc("UpdateDeckString", UpdateDeckString, typeof(string));
 
 			networkObject.onDestroy += DestroyGameObject;
 
@@ -109,16 +107,10 @@ namespace BeardedManStudios.Forge.Networking.Generated
 
 		/// <summary>
 		/// Arguments:
-		/// int seed
-		/// </summary>
-		public abstract void SetDeckSeed(RpcArgs args);
-		/// <summary>
-		/// Arguments:
 		/// int playerIndex
-		/// int playerType
 		/// bool isHost
 		/// </summary>
-		public abstract void AddPlayer(RpcArgs args);
+		public abstract void AddNetworkPlayer(RpcArgs args);
 		/// <summary>
 		/// Arguments:
 		/// </summary>
@@ -130,7 +122,7 @@ namespace BeardedManStudios.Forge.Networking.Generated
 		/// <summary>
 		/// Arguments:
 		/// </summary>
-		public abstract void GetDeckString(RpcArgs args);
+		public abstract void UpdateDeckString(RpcArgs args);
 
 		// DO NOT TOUCH, THIS GETS GENERATED PLEASE EXTEND THIS CLASS IF YOU WISH TO HAVE CUSTOM CODE ADDITIONS
 	}

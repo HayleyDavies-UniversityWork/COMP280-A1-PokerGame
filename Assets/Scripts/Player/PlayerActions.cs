@@ -153,6 +153,8 @@ namespace Poker.Game.Players
             {
                 case PlayerType.AI:
                     yield return new WaitForSeconds(UnityEngine.Random.Range(0f, 3f));
+
+                    networkPlayer.LocalAction((int)option, amount);
                     break;
                 case PlayerType.Player:
                     playerUI.DisableUI();
