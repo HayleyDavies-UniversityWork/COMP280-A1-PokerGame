@@ -120,23 +120,33 @@ namespace Poker.Game.Players
             }
         }
 
+        /// <summary>
+        /// Handle the player's UI
+        /// </summary>
         void HandlePlayerAI()
         {
+            // get the poker table and current bet
             Table pokerTable = gameController.pokerTable;
             int currentBet = gameController.currentBet - spendThisRound;
 
+            // calculate an action
             AIAction action = playerAI.CalculatePlay(player.hand, pokerTable.cards, currentBet, (int)gameController.nextStage);
 
+            // log what the ai has chosen to do
             Debugger.Log($"Player {player.number} has chosen to {action.option} spending {action.money}");
 
+            // switch the action's option
             switch (action.option)
             {
+                // bet
                 case PlayerOption.Bet:
                     Bet(action.money);
                     break;
+                // call
                 case PlayerOption.Call:
                     Call();
                     break;
+                // fold
                 case PlayerOption.Fold:
                     Fold();
                     break;

@@ -18,8 +18,6 @@ namespace Poker.Game.AI
     {
         public PlayerActions playerActions;
         public HandValue handValue;
-
-        public int moneyInvested;
         public int bluffChance;
         public int minBluffChance = 1;
         public int maxBluffChance = 75;
@@ -27,7 +25,6 @@ namespace Poker.Game.AI
         public float value;
 
         float betThreshold;
-        float callThreshold;
 
 
         // Start is called before the first frame update
@@ -35,8 +32,7 @@ namespace Poker.Game.AI
         {
             // generate a random bluff chance and calculation thresholds
             bluffChance = Random.Range(minBluffChance, maxBluffChance);
-            betThreshold = Random.Range(0.5f, 0.9f);
-            callThreshold = Random.Range(0.1f, 0.4f);
+            betThreshold = Random.Range(0.3f, 0.9f);
         }
 
         /// <summary>
@@ -51,6 +47,7 @@ namespace Poker.Game.AI
         {
             // create a new action
             AIAction action;
+            action.money = 0;
 
             // get how much money is availible to the ai
             int availibleMoney = playerActions.player.money;
@@ -64,46 +61,57 @@ namespace Poker.Game.AI
             // work out the total value of the hand
             float totalValue = handValue.Total * ((int)handValue.Hand + 1);
 
+            // if the current bid is 0 add the bluff chance
             if (currentBid == 0)
             {
                 // add the bluff chance
                 totalValue += bluffChance;
             }
 
-            // if we aren't on the starting round 
+            // if we aren't on the starting round, conserve money
             if (currentRound != 0)
             {
                 totalValue -= ((currentBid / (availibleMoney + moneyInPot)) * 100) / currentRound;
             }
 
+            // normalise the value (kinda)
             value = totalValue / maxValue;
 
-            Debug.LogWarning($"AI {playerActions.player.number}'s value = {totalValue} | {value} | {betThreshold} | {callThreshold} | {bluffChance}");
+            // log some information about the ai
+            Debugger.Log($"AI {playerActions.player.number}'s value = {totalValue} | {value} | {betThreshold} | {bluffChance}");
 
+            // calculate the max bit
             int maxBid = Mathf.RoundToInt(availibleMoney * value);
 
+            // if the value is greater than the bet threshold, make a bet
             if (value >= betThreshold)
             {
+                // set the action to bet
                 action.option = PlayerOption.Bet;
-                float normalizeValue = ((value - betThreshold) / (betThreshold - 1));
-                action.money = maxBid;
+                // normalize the value
+                float normalizeValue = ((value - 0.3f) / (0.9f - 0.3f));
+                // calculate bet amount
+                action.money = Mathf.RoundToInt(availibleMoney * normalizeValue);
             }
-            else if (value >= callThreshold || currentBid <= maxBid)
+            // if the current bid is less than the max bid for the ai
+            else if (currentBid <= maxBid)
             {
+                // call the bid
                 action.option = PlayerOption.Call;
-                action.money = 0;
             }
             else
             {
+                // fold
                 action.option = PlayerOption.Fold;
-                action.money = 0;
             }
 
+            // cap the money to the max availible
             if (action.money > availibleMoney)
             {
                 action.money = availibleMoney;
             }
 
+            // return the action
             return action;
         }
     }
