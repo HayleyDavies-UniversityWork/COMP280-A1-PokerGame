@@ -14,7 +14,7 @@ Within forge, I utilise two NetworkObjects; one for players and another for the 
 
 | Player | Gameplay Controller |
 | :---: | :---: |
-| ![](/img/Networking/PlayerNetworkObject.png) | ![](img/Networking/GameplayControllerNetworkObject.png) |
+| <img src="./img/Networking/PlayerNetworkObject.png" width=50%> | <img src="./img/Networking/GameplayControllerNetworkObject.png" width=50%> |
 
 ---
 
@@ -36,7 +36,7 @@ This uses no arguments.
 
 | `SetPlayerActions()` | `JoinTable()` |
 | :---: | :---: |
-| ![](/img/Networking/PlayerSetPlayerActions.png) | ![](img/Networking/PlayerJoinTable.png) |
+| <img src="./img/Networking/PlayerSetPlayerActions.png" width=50%> | <img src="./img/Networking/PlayerJoinTable.png" width=50%> |
 
 ---
 
@@ -51,7 +51,7 @@ This uses no arguments.
 
 | `LocalAction()` | `NetworkAction()` |
 | :---: | :---: |
-| ![](/img/Networking/PlayerSetPlayerActions.png) | ![](img/Networking/PlayerNetworkAction.png) |
+| <img src="./img/Networking/PlayerSetPlayerActions.png" width=50%> | <img src="./img/Networking/PlayerNetworkAction.png" width=50%> |
 
 ---
 
@@ -76,7 +76,7 @@ This sends two arguments.
 
 | `AddPlayer()` | `AddNetworkPlayer()` |
 | :---: | :---: |
-| ![](/img/Networking/GameplayControllerAddPlayer.png) | ![](img/Networking/GameplayControllerAddNetworkPlayer.png) |
+| <img src="./img/Networking/GameplayControllerAddPlayer.png" width=50%> | <img src="./img/Networking/GameplayControllerAddNetworkPlayer.png" width=50%> |
 
 ### RPC: `StartGame()`
 
@@ -86,7 +86,7 @@ This sends no arguments.
 
 | `StartGame()` |
 | :---: |
-| ![](/img/Networking/GameplayControllerStartGame.png) |
+| <img src="./img/Networking/GameplayControllerStartGame.png" width=50%> |
 
 ### RPC: `RestartGame()`
 
@@ -96,7 +96,7 @@ This sends no arguments.
 
 | `RestartGame()` & `StartNextPhase()` |
 | :---: |
-| ![](/img/Networking/GameplayControllerRestartGameNetwork.png) |
+| <img src="./img/Networking/GameplayControllerRestartGameNetwork.png" width=50%> |
 
 ### RPC: `UpdateDeckString()`
 
@@ -112,4 +112,4 @@ An RPC is being used here - rather than a field - due to the fact that FNR doesn
 
 | `Initialize()` | `RestartGame()` | `UpdateDeckString()` |
 | :---: | :---: | :---: |
-| ![](/img/Networking/GameplayControllerInitialize.png) | ![](img/Networking/GameplayControllerRestartGame.png) | ![](img/Networking/GameplayControllerUpdateDeckString.png) |
+| <img src="./img/Networking/GameplayControllerInitialize.png" width=50%> | <img src="./img/Networking/GameplayControllerRestartGame.png" width=50%> | <img src="./img/Networking/GameplayControllerUpdateDeckString.png" width=50%> |
