@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
+using Unity.VectorGraphics;
 
 namespace Poker.Game.Display
 {
@@ -17,6 +18,7 @@ namespace Poker.Game.Display
         bool displayFront = false;
         private Quaternion startRotation;
         public bool showToPlayer = false;
+        private SVGImage cardBackImage;
 
         // Start is called before the first frame update
         void Start()
@@ -26,6 +28,8 @@ namespace Poker.Game.Display
 
         void Initialize()
         {
+            cardBackImage = cardBack.GetComponent<SVGImage>();
+
             startRotation = transform.rotation;
             this.GetComponent<Canvas>().enabled = false;
         }
@@ -91,7 +95,13 @@ namespace Poker.Game.Display
             this.GetComponent<Canvas>().enabled = false;
             cardBack.SetActive(true);
             cardFront.SetActive(false);
+
+            ChangeCardColor(Color.white);
+        }
+
+        public void ChangeCardColor(Color color)
+        {
+            cardBackImage.color = color;
         }
     }
-
 }

@@ -28,5 +28,13 @@ namespace Poker.Game.Display
                 bank.text = $"${player.money}";
             }
         }
+
+        public void Folded()
+        {
+            foreach (DisplayCard dc in handCards)
+            {
+                dc.ChangeCardColor(Color.gray);
+            }
+        }
     }
 }

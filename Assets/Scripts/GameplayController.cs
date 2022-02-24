@@ -165,6 +165,7 @@ namespace Poker.Game
             {
                 networkObject.SendRpc(RPC_START_GAME, Receivers.OthersBuffered);
             }
+            tableDisplay.DisplayWinner();
             foldedPlayers = new Player[pokerTable.playerList.Count];
             singleton = this;
             mainMenuCanvas.enabled = false;
@@ -288,22 +289,18 @@ namespace Poker.Game
             }
             int totalPot = pokerTable.GetTotalPot();
 
+            string winnerText = "Winners:";
             foreach (Player p in pokerTable.playerList)
             {
                 if (winners.Contains(p))
                 {
                     p.money += totalPot / winners.Count;
                     Debugger.Log($"Player {p.number} wins {totalPot / winners.Count}");
+                    winnerText += $"\nPlayer {p.number}: ${totalPot / winners.Count}";
                 }
             }
 
-            foreach (Player p in foldedPlayers)
-            {
-                if (p != null)
-                {
-                    pokerTable.playerList.Insert(p.number, p);
-                }
-            }
+            tableDisplay.DisplayWinner(winnerText);
 
             foreach (Player p in pokerTable.playerList)
             {
@@ -313,6 +310,14 @@ namespace Poker.Game
                     {
                         StartCoroutine(c.FlipCard(180));
                     }
+                }
+            }
+
+            foreach (Player p in foldedPlayers)
+            {
+                if (p != null)
+                {
+                    pokerTable.playerList.Insert(p.number, p);
                 }
             }
 

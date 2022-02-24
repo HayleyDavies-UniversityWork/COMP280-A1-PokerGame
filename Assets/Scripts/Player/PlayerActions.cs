@@ -111,6 +111,8 @@ namespace Poker.Game.Players
                     if (isActionQueued)
                     {
                         queuedAction.Invoke();
+                        queuedAction = null;
+                        isActionQueued = false;
                     }
                     if (player.money == 0)
                     {
@@ -150,6 +152,7 @@ namespace Poker.Game.Players
             switch (playerType)
             {
                 case PlayerType.AI:
+                    yield return new WaitForSeconds(UnityEngine.Random.Range(0f, 3f));
                     break;
                 case PlayerType.Player:
                     playerUI.DisableUI();
@@ -204,10 +207,11 @@ namespace Poker.Game.Players
         {
             if (!isTurn)
             {
-                QueueAction(CallAny);
+                QueueAction(CallAny, "Call Any");
             }
             else
             {
+                playerUI.SetButtonOpacity("Call Any", 1f);
                 Call();
             }
         }
@@ -216,10 +220,11 @@ namespace Poker.Game.Players
         {
             if (!isTurn)
             {
-                QueueAction(CheckFold);
+                QueueAction(CheckFold, "Check/Fold");
             }
             else
             {
+                playerUI.SetButtonOpacity("Check/Fold", 1f);
                 if (gameController.currentBet > 0)
                 {
                     Fold();
@@ -237,18 +242,25 @@ namespace Poker.Game.Players
 
             if (!isTurn)
             {
-                QueueAction(Fold);
+                QueueAction(Fold, "Fold");
             }
             else
             {
+                playerUI.SetButtonOpacity("Fold", 1f);
                 isOut = true;
+            }
+
+            if (playerType != PlayerType.Player)
+            {
+                player.display.Folded();
             }
 
             StartCoroutine(EndTurn(0));
         }
 
-        void QueueAction(UnityAction actionToQueue)
+        void QueueAction(UnityAction actionToQueue, string buttonName)
         {
+            float opacity = 1f;
             if (actionToQueue == queuedAction)
             {
                 queuedAction = null;
@@ -258,7 +270,9 @@ namespace Poker.Game.Players
             {
                 queuedAction = actionToQueue;
                 isActionQueued = true;
+                opacity = 0.5f;
             }
+            playerUI.SetButtonOpacity(buttonName, opacity);
         }
 
         IEnumerator PlayerTimeout(int timeoutLength)

@@ -61,7 +61,7 @@ namespace Poker.Game.AI
                 float normalizeValue = ((value - betThreshold) / (betThreshold - 1));
                 action.money = Mathf.RoundToInt(availibleMoney * value);
             }
-            else if (value >= callThreshold || currentBid == 0)
+            else if (value >= callThreshold || currentBid <= 50)
             {
                 action.option = PlayerOption.Call;
                 action.money = 0;

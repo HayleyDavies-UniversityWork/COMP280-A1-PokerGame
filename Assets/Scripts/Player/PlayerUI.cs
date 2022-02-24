@@ -82,6 +82,31 @@ namespace Poker.Game.Players
             button.interactable = true;
         }
 
+        public void SetButtonOpacity(string buttonName, float opacity)
+        {
+            Button button = null;
+
+            foreach (Button b in buttonUI)
+            {
+                if (b.name == buttonName)
+                {
+                    button = b;
+                    break;
+                }
+            }
+
+            if (button == null)
+            {
+                return;
+            }
+
+            Color color = button.image.color;
+
+            color.a = opacity;
+
+            button.image.color = color;
+        }
+
         public void Call()
         {
             playerActions.Call();

@@ -10,6 +10,7 @@ namespace Poker.Game.Display
         public Table pokerTable;
 
         public TextMeshProUGUI potSize;
+        public TextMeshProUGUI winner;
         // Start is called before the first frame update
         void Start()
         {
@@ -23,6 +24,16 @@ namespace Poker.Game.Display
             {
                 potSize.text = $"Pot:\n${pokerTable.GetTotalPot()}";
             }
+        }
+
+        public void DisplayWinner()
+        {
+            DisplayWinner("");
+        }
+
+        public void DisplayWinner(string winnerText)
+        {
+            winner.text = winnerText;
         }
     }
 
