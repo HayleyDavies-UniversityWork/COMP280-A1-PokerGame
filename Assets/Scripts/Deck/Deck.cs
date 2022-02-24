@@ -1,6 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using System;
+using UnityEngine;
+using UnityEngine.Profiling;
 
 namespace Poker.Game
 {
@@ -12,11 +14,12 @@ namespace Poker.Game
         // a list of all the possible card combinations
         List<Card> allCards;
 
-        Random prng;
+        System.Random prng;
 
         public string deckValue;
 
         private char separator = '-';
+
 
         /// <summary>
         /// a collection which stores cards
@@ -26,8 +29,9 @@ namespace Poker.Game
             // get all the cards
             allCards = GetAllCards();
 
-            prng = new Random(seed);
+            prng = new System.Random(seed);
             // and shuffle them
+            shuffledCards = ShuffleDeck(this);
             shuffledCards = Shuffle(this);
             deckValue = "";
 
@@ -42,6 +46,8 @@ namespace Poker.Game
                 deckValue += $"{index}";
                 i++;
             }
+
+            Debug.LogError(deckValue);
         }
 
         public Deck(string deckString)
@@ -71,22 +77,127 @@ namespace Poker.Game
         /// <returns>a queue of the shuffled deck</returns>
         public Queue<Card> Shuffle(Deck deck)
         {
+            //  start profiling this script
+            Profiler.BeginSample("Deck.Shuffle");
+
+            // start a new stopwatch
+            var watch = new System.Diagnostics.Stopwatch();
+            watch.Start();
+
+            // define and create a new shuffle
             Queue<Card> shuffle = new Queue<Card>();
 
-            List<Card> cardsInDeck = new List<Card>(deck.allCards);
-
-            int cardsLength = deck.allCards.Count;
-            // for all the values in the deck
-            for (int i = 0; i < cardsLength; i++)
+            // repeat 10 times to exaggerate timings
+            for (int j = 0; j < 10; j++)
             {
-                // get a random index of the values remaining
-                int index = prng.Next(0, cardsLength - i);
-                // add that card to the deck
-                shuffle.Enqueue(cardsInDeck[index]);
-                // remove the card from the original deck
-                cardsInDeck.RemoveAt(index);
+                // create a new shuffle
+                shuffle = new Queue<Card>();
+
+                // create a new deck of all cards
+                List<Card> cardsInDeck = new List<Card>(deck.allCards);
+
+                // get the length of the deck
+                int cardsLength = deck.allCards.Count;
+
+                // for all the values in the deck
+                for (int i = 0; i < cardsLength; i++)
+                {
+                    // get a random index of the values remaining
+                    int index = prng.Next(0, cardsLength - i);
+
+                    // get the card at that index
+                    Card card = cardsInDeck[index];
+
+                    // if the card doesn't already exist
+                    if (!shuffle.Contains(card))
+                    {
+                        // add that card to the deck
+                        shuffle.Enqueue(card);
+                    }
+                    // otherwise log that it failed
+                    else
+                    {
+                        Debug.Log("ERROR");
+                    }
+
+                    // remove the card from the original deck
+                    cardsInDeck.RemoveAt(index);
+                }
             }
 
+            // stop the stopwatch
+            watch.Stop();
+            // log how much time this took by the watch
+            Debug.LogError($"Shuffle {watch.ElapsedMilliseconds}");
+
+            // end the profiler sample
+            Profiler.EndSample();
+
+            // return the shuffled deck
+            return shuffle;
+        }
+
+        /// <summary>
+        /// shuffle all of the cards
+        /// </summary>
+        /// <param name="deck">the deck to shuffle</param>
+        /// <returns>a queue of the shuffled deck</returns>
+        public Queue<Card> ShuffleDeck(Deck deck)
+        {
+            //  start profiling this script
+            Profiler.BeginSample("Deck.ShuffleDeck");
+
+            // start a new stopwatch
+            var watch = new System.Diagnostics.Stopwatch();
+            watch.Start();
+
+            // define and create a new shuffle
+            Queue<Card> shuffle = new Queue<Card>();
+
+            // repeat 10 times to exaggerate timings
+            for (int j = 0; j < 10; j++)
+            {
+                // create a new shuffle
+                shuffle = new Queue<Card>();
+
+                // create a new deck of all cards
+                List<Card> cardsInDeck = new List<Card>(deck.allCards);
+
+                // get the length of the deck
+                int cardsLength = deck.allCards.Count;
+
+                // while the shuffled deck's count is less than a normal deck
+                while (shuffle.Count < cardsLength)
+                {
+                    // get a random index of the values remaining
+                    int index = prng.Next(0, cardsLength);
+
+                    // get the card at that index
+                    Card card = cardsInDeck[index];
+
+                    // if the card doesn't already exist
+                    if (!shuffle.Contains(card))
+                    {
+                        // add that card to the deck
+                        shuffle.Enqueue(card);
+                    }
+                    // otherwise log that it failed
+                    else
+                    {
+                        Debug.Log("ERROR");
+                    }
+                }
+            }
+
+            // stop the stopwatch
+            watch.Stop();
+            // log how much time this took by the watch
+            Debug.LogError($"Shuffle {watch.ElapsedMilliseconds}");
+
+            // end the profiler sample
+            Profiler.EndSample();
+
+            // return the shuffled deck
             return shuffle;
         }
 
@@ -130,16 +241,6 @@ namespace Poker.Game
             }
 
             Debugger.Log(output);
-        }
-
-        /// <summary>
-        /// shuffle all of the cards
-        /// </summary>
-        /// <param name="deck">the deck to shuffle</param>
-        /// <returns>a queue of the shuffled deck</returns>
-        public static Queue<Card> Shuffle(this Deck deck)
-        {
-            return Shuffle(deck);
         }
 
         public static Card DealCard(this Deck deck)

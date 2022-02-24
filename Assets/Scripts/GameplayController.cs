@@ -354,7 +354,6 @@ namespace Poker.Game
 
         private void FindWinners()
         {
-
             List<Player> winners = new List<Player>();
             if (pokerTable.playerList.Count == 1)
             {
