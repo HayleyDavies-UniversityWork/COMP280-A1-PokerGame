@@ -31,7 +31,6 @@ namespace Poker.Game
 
             prng = new System.Random(seed);
             // and shuffle them
-            shuffledCards = ShuffleDeck(this);
             shuffledCards = Shuffle(this);
             deckValue = "";
 
@@ -87,42 +86,38 @@ namespace Poker.Game
             // define and create a new shuffle
             Queue<Card> shuffle = new Queue<Card>();
 
-            // repeat 10 times to exaggerate timings
-            for (int j = 0; j < 10; j++)
+            // create a new shuffle
+            shuffle = new Queue<Card>();
+
+            // create a new deck of all cards
+            List<Card> cardsInDeck = new List<Card>(deck.allCards);
+
+            // get the length of the deck
+            int cardsLength = deck.allCards.Count;
+
+            // for all the values in the deck
+            for (int i = 0; i < cardsLength; i++)
             {
-                // create a new shuffle
-                shuffle = new Queue<Card>();
+                // get a random index of the values remaining
+                int index = prng.Next(0, cardsLength - i);
 
-                // create a new deck of all cards
-                List<Card> cardsInDeck = new List<Card>(deck.allCards);
+                // get the card at that index
+                Card card = cardsInDeck[index];
 
-                // get the length of the deck
-                int cardsLength = deck.allCards.Count;
-
-                // for all the values in the deck
-                for (int i = 0; i < cardsLength; i++)
+                // if the card doesn't already exist
+                if (!shuffle.Contains(card))
                 {
-                    // get a random index of the values remaining
-                    int index = prng.Next(0, cardsLength - i);
-
-                    // get the card at that index
-                    Card card = cardsInDeck[index];
-
-                    // if the card doesn't already exist
-                    if (!shuffle.Contains(card))
-                    {
-                        // add that card to the deck
-                        shuffle.Enqueue(card);
-                    }
-                    // otherwise log that it failed
-                    else
-                    {
-                        Debug.Log("ERROR");
-                    }
-
-                    // remove the card from the original deck
-                    cardsInDeck.RemoveAt(index);
+                    // add that card to the deck
+                    shuffle.Enqueue(card);
                 }
+                // otherwise log that it failed
+                else
+                {
+                    Debug.Log("ERROR");
+                }
+
+                // remove the card from the original deck
+                cardsInDeck.RemoveAt(index);
             }
 
             // stop the stopwatch
@@ -154,38 +149,34 @@ namespace Poker.Game
             // define and create a new shuffle
             Queue<Card> shuffle = new Queue<Card>();
 
-            // repeat 10 times to exaggerate timings
-            for (int j = 0; j < 10; j++)
+            // create a new shuffle
+            shuffle = new Queue<Card>();
+
+            // create a new deck of all cards
+            List<Card> cardsInDeck = new List<Card>(deck.allCards);
+
+            // get the length of the deck
+            int cardsLength = deck.allCards.Count;
+
+            // while the shuffled deck's count is less than a normal deck
+            while (shuffle.Count < cardsLength)
             {
-                // create a new shuffle
-                shuffle = new Queue<Card>();
+                // get a random index of the values remaining
+                int index = prng.Next(0, cardsLength);
 
-                // create a new deck of all cards
-                List<Card> cardsInDeck = new List<Card>(deck.allCards);
+                // get the card at that index
+                Card card = cardsInDeck[index];
 
-                // get the length of the deck
-                int cardsLength = deck.allCards.Count;
-
-                // while the shuffled deck's count is less than a normal deck
-                while (shuffle.Count < cardsLength)
+                // if the card doesn't already exist
+                if (!shuffle.Contains(card))
                 {
-                    // get a random index of the values remaining
-                    int index = prng.Next(0, cardsLength);
-
-                    // get the card at that index
-                    Card card = cardsInDeck[index];
-
-                    // if the card doesn't already exist
-                    if (!shuffle.Contains(card))
-                    {
-                        // add that card to the deck
-                        shuffle.Enqueue(card);
-                    }
-                    // otherwise log that it failed
-                    else
-                    {
-                        Debug.Log("ERROR");
-                    }
+                    // add that card to the deck
+                    shuffle.Enqueue(card);
+                }
+                // otherwise log that it failed
+                else
+                {
+                    Debug.Log("ERROR");
                 }
             }
 
