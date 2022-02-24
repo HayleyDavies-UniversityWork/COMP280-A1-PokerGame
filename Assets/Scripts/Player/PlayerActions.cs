@@ -45,10 +45,6 @@ namespace Poker.Game.Players
 
         Coroutine timer;
 
-        private void Start()
-        {
-        }
-
         public void Initalize(Player playerReference, PlayerType typeOfPlayer)
         {
             gameController = GameplayController.singleton;
@@ -195,14 +191,21 @@ namespace Poker.Game.Players
 
         public void Bet(int amount)
         {
-            if (amount > gameController.currentBet && amount <= player.money)
+            if (amount < gameController.currentBet)
             {
-                option = PlayerOption.Bet;
-                player.TakeMoney(amount);
-                gameController.currentBet = amount;
-
-                StartCoroutine(EndTurn(amount));
+                amount = gameController.currentBet;
             }
+
+            if (amount > player.money)
+            {
+                amount = player.money;
+            }
+
+            option = PlayerOption.Bet;
+            player.TakeMoney(amount);
+            gameController.currentBet = amount;
+
+            StartCoroutine(EndTurn(amount));
         }
 
         public void CallAny()

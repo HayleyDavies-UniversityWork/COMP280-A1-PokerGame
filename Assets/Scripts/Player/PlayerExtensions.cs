@@ -43,6 +43,7 @@ namespace Poker.Game.Players
             player.table.AddToPot(amount, player, newPot);
             player.money -= amount;
             player.actions.spendThisRound += amount;
+            player.actions.moneyInPot += amount;
             Debugger.Log($"Player {player.number} added {amount} to pot. New pot? {newPot}");
         }
 
@@ -63,9 +64,15 @@ namespace Poker.Game.Players
         {
             player.hand = new Card[2];
             player.actions.isOut = false;
+            player.actions.moneyInPot = 0;
             foreach (DisplayCard dc in player.display.handCards)
             {
                 dc.Setup();
+            }
+
+            if (player.money == 0)
+            {
+                player.money = 1000;
             }
         }
     }

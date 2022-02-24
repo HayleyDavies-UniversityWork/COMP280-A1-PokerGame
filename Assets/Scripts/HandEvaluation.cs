@@ -32,7 +32,14 @@ namespace Poker.Game.Utils
         {
             HandValue handValue = new HandValue();
             HandValue tempHandValue = new HandValue();
-            List<Card> cards = new List<Card>(handCards).Concat(tableCards).ToList();
+            List<Card> cards = new List<Card>(handCards);
+            foreach (Card c in tableCards)
+            {
+                if (c != null)
+                {
+                    cards.Add(c);
+                }
+            }
             cards = SortCardsByValue(cards);
 
             List<Card> straightCards;
@@ -51,7 +58,7 @@ namespace Poker.Game.Utils
                 }
             }
 
-            if (handValue.Hand < tempHandValue.Hand)
+            if (handValue.Hand <= tempHandValue.Hand)
             {
                 handValue = tempHandValue;
             }
@@ -69,20 +76,7 @@ namespace Poker.Game.Utils
 
         static List<Card> SortCardsByValue(List<Card> cards)
         {
-
             List<Card> sortedCards = new List<Card>();
-
-            int totalValidCards = cards.Count;
-            for (int i = 0; i < cards.Count; i++)
-            {
-                if (cards[i] == null)
-                {
-                    totalValidCards = i;
-                    break;
-                }
-            }
-
-            cards.RemoveRange(totalValidCards, cards.Count - totalValidCards);
 
             foreach (Card c in cards.OrderBy(c => c.Value))
             {
